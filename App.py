@@ -1,1 +1,6 @@
-print("Hello, Misha(AKA GDE BOT ?)!")
+#
+# Description: some decr
+#
+# Authors: Ivan Maruzhenko
+#
+# version 0.0
