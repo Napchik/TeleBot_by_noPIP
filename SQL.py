@@ -1,6 +1,6 @@
 #
 # Description: some decr
 #
-# Authors: Ivan Skorobagatko
+# Authors: Mikhail Shikalovskyi
 #
 # version 0.0
