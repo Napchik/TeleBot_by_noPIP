@@ -1,26 +1,18 @@
 #
-# Description: Download the schedule from the SQL table and display to the user.
+# Description: Display schedule to the user.
 #
-# Authors: Ivan Maruzhenko
+# Author: Ivan Maruzhenko
 #
-# version 0.0
+# version 0.1
 
-class App:
 
-    # internal variables
+def schedule_for_the_day():
+    pass
 
-    # functions
-    def download_schedule(self):
-        pass
 
-    def output_schedule(self):
-        pass
+def schedule_for_the_week():
+    pass
 
-    def schedule_for_the_day(self):
-        pass
 
-    def schedule_for_the_week(self):
-        pass
-
-    def all_schedule(self):
-        pass
+def all_schedule():
+    pass
