@@ -4,8 +4,9 @@
 
  Authors: Mikhail Shikalovskyi
 
- version 1.0
+ version 1.2
 """
+
 import sqlite3
 
 
@@ -68,8 +69,8 @@ Examples:
         
     5. INSERTING (UNIQUE) with UPDATING if EXISTS
         
-        filter = "SELECT * FROM Schedule WHERE grup = 'io-13'"
-        action1  = "INSERT INTO {table} ({what}}) VALUES ({val})"
+        filter = "SELECT * FROM Schedule WHERE group_name = 'io-13'"
+        action1  = "INSERT INTO {table} ({what}) VALUES ({val})"
         action2  = "UPDATE {table} SET {what} = {val} WHERE **"
         exist_test_insert(filter, action1, action2) 
 """

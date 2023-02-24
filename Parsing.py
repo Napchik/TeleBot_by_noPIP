@@ -176,18 +176,17 @@ class Parser:
 
         return self.parsed_data
 
-
 # Test section
 # WARNING. This file isn't meant to ever be executable. Section below contains some test-purpose code
 # It will be removed in release version
 
-parser = Parser()
+# parser = Parser()
 
-print(parser.parse(group="ІО-11"))
-print(parser.parse(group="ІО-12"))
-print(parser.parse(group="ІО-13"))
-print(parser.parse(group="ІО-14"))
-print(parser.parse(group="ІО-15"))
-print(parser.parse(group="ІО-16"))
+# print(parser.parse(group="ІО-11"))
+# print(parser.parse(group="ІО-12"))
+# print(parser.parse(group="ІО-13"))
+# print(parser.parse(group="ІО-14"))
+# print(parser.parse(group="ІО-15"))
+# print(parser.parse(group="ІО-16"))
 # This code will prompt Exception
-print(parser.parse(group="IO-13"))
+# print(parser.parse(group="IO-13"))
