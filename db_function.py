@@ -5,8 +5,8 @@
        DataBase consists of some tables:
            log             -- id, parsing_time, status
            info_global     -- week
-           info_professor  -- group_name, subject, name, link
-           info_users      -- user_id, group_name, schedule_switch
+           info_professor  -- group_name, subject, name, type, link
+           info_users      -- user_id, group_name, schedule_switch, status
            list_groups     -- group_name
            schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
            users           -- user_id, user_name,
@@ -31,7 +31,6 @@ def reformat_list(data: list) -> list:
 def reformat_str(data: list) -> str:
     """Function to convert executed data to str"""
     result = ""
-
     if str(data) == "[]":
         return result
     elif data[0][0] is None:
@@ -107,23 +106,7 @@ def inserter_professor(week: str, group: str, data: list):
             if lessons_professors is not None:
                 subject = lessons_professors[0].replace('\'', '`') + " " + lessons_professors[2].replace('\'', '`')
                 professor = lessons_professors[1].replace('\'', '`')
-                list_subjects = subject.split(", ")
-                list_professors = professor.split(", ")
-                for i in range(len(list_subjects)):
-                    filter = f"SELECT '{list_subjects[i]}' FROM info_professor WHERE group_name = '{group}' AND name = '{list_professors[i]}'"
-                    action1 = f"INSERT INTO info_professor (group_name, subject, name) VALUES ('{group}', '{list_subjects[i]}', '{list_professors[i]}')"
-                    action2 = f"UPDATE info_professor SET name = '{list_professors[i]}' WHERE group_name = '{group}' AND subject = '{list_subjects[i]}'"
-                    SQL.exist_test_insert(filter, action1, action2)
-
-
-for i in all_groups():
-    lessons = schedule_day_by_group(i, 3).split("; ")
-    for lesson in lessons:
-        result = ""
-        b = lesson.split(", ")
-        for j in b:
-            k = professor_by_subject("ІО-13", j)
-            if j != "" and k != "":
-                result += (j + " " + k + ", ")
-        print(result)
-    print("\n\n")
+                type = lessons_professors[2].replace('\'', '`')
+                filter = f"SELECT * FROM info_professor WHERE group_name = '{group}' AND subject = '{subject}'"
+                action1 = f"INSERT INTO info_professor (group_name, subject, name, type) VALUES ('{group}', '{subject}', '{professor}', '{type}')"
+                SQL.exist_test_insert(filter, action1, "")
