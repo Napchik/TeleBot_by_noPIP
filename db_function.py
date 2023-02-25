@@ -20,7 +20,7 @@ import SQL
 from datetime import datetime
 
 
-def reformat_list(data) -> list:
+def reformat_list(data: list) -> list:
     """Function to convert executed data to list"""
     result = []
     for i in data:
@@ -28,10 +28,13 @@ def reformat_list(data) -> list:
     return result
 
 
-def reformat_str(data) -> str:
+def reformat_str(data: list) -> str:
     """Function to convert executed data to str"""
     result = ""
-    if data[0][0] is None:
+
+    if str(data) == "[]":
+        return result
+    elif data[0][0] is None:
         return "None"
     else:
         for i in data:
@@ -49,7 +52,7 @@ def today_day() -> int:
     return result
 
 
-def users_by_group(group) -> list:
+def users_by_group(group: str) -> list:
     """Function to execute all user_id by group"""
     filter = f"SELECT user_id FROM info_users WHERE group_name = '{group}'"
     result = reformat_list(SQL.execute(filter))
@@ -63,14 +66,20 @@ def all_groups() -> list:
     return result
 
 
-def schedule_day_by_group(group, day) -> str:
+def schedule_day_by_group(group: str, day: int) -> str:
     """Function to execute schedule for special day"""
     filter = f"SELECT day{day} FROM schedule WHERE group_name = '{group}'"
     result = reformat_str(SQL.execute(filter))
     return result
 
 
-def inserter_schedule(week, group, data):
+def professor_by_subject(group: str, subject: str) -> str:
+    filter = f"SELECT name FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
+    result = reformat_str(SQL.execute(filter))
+    return result
+
+
+def inserter_schedule(week: str, group: str, data: list):
     """Function inserts or updates schedule for a group"""
     if week == "week1":
         counter = 1
@@ -91,7 +100,7 @@ def inserter_schedule(week, group, data):
         counter += 1
 
 
-def inserter_professor(week, group, data):
+def inserter_professor(week: str, group: str, data: list):
     """Function inserts or updates professors for a group"""
     for days in data[f"{week}"]:
         for lessons_professors in days:
@@ -105,3 +114,16 @@ def inserter_professor(week, group, data):
                     action1 = f"INSERT INTO info_professor (group_name, subject, name) VALUES ('{group}', '{list_subjects[i]}', '{list_professors[i]}')"
                     action2 = f"UPDATE info_professor SET name = '{list_professors[i]}' WHERE group_name = '{group}' AND subject = '{list_subjects[i]}'"
                     SQL.exist_test_insert(filter, action1, action2)
+
+
+for i in all_groups():
+    lessons = schedule_day_by_group(i, 3).split("; ")
+    for lesson in lessons:
+        result = ""
+        b = lesson.split(", ")
+        for j in b:
+            k = professor_by_subject("ІО-13", j)
+            if j != "" and k != "":
+                result += (j + " " + k + ", ")
+        print(result)
+    print("\n\n")
