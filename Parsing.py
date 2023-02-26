@@ -9,11 +9,12 @@
     Output: data (dict)
 
     Authors: Ivan Skorobagatko
-    Version: 0.1 (beta-debug)
+    Version: 0.2 (beta-debug)
 """
 
 import requests
 import time
+import re
 from bs4 import BeautifulSoup
 
 
@@ -39,6 +40,7 @@ class Parser:
         self.payload = {}
         self.data = []
         self.parsed_data = {}
+        self.types = ['Лек on-line', 'Прак on-line', 'Лаб on-line']
 
     def _response_handler(self, url: str, method: str):
         """
@@ -134,12 +136,15 @@ class Parser:
                 if items[pos].text == "":
                     formatted_data.append(None)
                 else:
-                    par = [item.text for item in items[pos].select("span a")]
-                    part = [item.text for item in items[pos].select("a")]
-                    subject = ", ".join([subj for subj in part if subj in par])
-                    professor = ", ".join(
-                        [prof for prof in part if prof not in par and prof not in part[len(part) - 1]])
-                    type_of_subject = part[len(part) - 1][4::]
+                    select1 = [item.text for item in items[pos].select("span a")]
+                    select2 = [item.text for item in items[pos].select("a")]
+                    subject = ", ".join([subj for subj in select2 if subj in select1])
+                    type_of_subject = ", ".join(
+                        [item for item in self.types if re.search(item, " ".join(select2)) is not None])
+                    professor = [prof for prof in select2 if prof not in select1]
+                    professor = [prof for prof in professor if
+                                 not re.search(" ".join(re.split('\\s', prof)[-2::]), " ".join(self.types))]
+                    professor = ", ".join(professor)
                     formatted_data.append((subject, professor, type_of_subject))
             self.data.append(formatted_data)
 
@@ -176,17 +181,23 @@ class Parser:
 
         return self.parsed_data
 
+
 # Test section
 # WARNING. This file isn't meant to ever be executable. Section below contains some test-purpose code
 # It will be removed in release version
 
-# parser = Parser()
+def test():
+    parser = Parser()
 
-# print(parser.parse(group="ІО-11"))
-# print(parser.parse(group="ІО-12"))
-# print(parser.parse(group="ІО-13"))
-# print(parser.parse(group="ІО-14"))
-# print(parser.parse(group="ІО-15"))
-# print(parser.parse(group="ІО-16"))
-# This code will prompt Exception
-# print(parser.parse(group="IO-13"))
+    print(parser.parse(group="ІО-11"))
+    print(parser.parse(group="ІО-12"))
+    print(parser.parse(group="ІО-13"))
+    print(parser.parse(group="ІО-14"))
+    print(parser.parse(group="ІО-15"))
+    print(parser.parse(group="ІО-16"))
+    print(parser.parse(group="ІП-11"))
+    # This code will prompt Exception
+    print(parser.parse(group="IO-13"))
+
+
+# test()
