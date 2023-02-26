@@ -77,6 +77,11 @@ def professor_by_subject(group: str, subject: str) -> str:
     result = reformat_str(SQL.execute(filter))
     return result
 
+def link_by_subject(group: str, subject: str):
+    filter = f"SELECT link FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
+    result = reformat_str(SQL.execute(filter))
+    return result
+
 
 def inserter_schedule(week: str, group: str, data: list):
     """Function inserts or updates schedule for a group"""
@@ -110,3 +115,4 @@ def inserter_professor(week: str, group: str, data: list):
                 filter = f"SELECT * FROM info_professor WHERE group_name = '{group}' AND subject = '{subject}'"
                 action1 = f"INSERT INTO info_professor (group_name, subject, name, type) VALUES ('{group}', '{subject}', '{professor}', '{type}')"
                 SQL.exist_test_insert(filter, action1, "")
+
