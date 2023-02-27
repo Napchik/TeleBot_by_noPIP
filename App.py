@@ -3,14 +3,17 @@
 #
 # Author: Ivan Maruzhenko
 #
-# version 0.1
+# version 0.2
 
 
 import logging
-
+from dotenv import load_dotenv, find_dotenv
+import os
 from aiogram import Bot, Dispatcher, executor, types
 
-API_TOKEN = 'BOT TOKEN HERE'
+load_dotenv(find_dotenv())
+
+API_TOKEN = os.getenv("TOKEN")
 
 # Configure logging
 
