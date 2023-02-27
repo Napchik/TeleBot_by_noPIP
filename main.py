@@ -1,13 +1,14 @@
 #
-# Description: some decr
+# Description: Program entry point.
 #
 # Authors: Mikhail Shikalovskyi
 #          Ivan Skorobagatko
 #          Ivan Maruzhenko
 #          Evhen Miholat
 #
-# version 0.0
+# version 0.1
+
+from App import app
 
 if __name__ == '__main__':
-    # bot.polling(none_stop=True)
-    pass
+    app()
