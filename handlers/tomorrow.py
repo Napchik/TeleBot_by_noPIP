@@ -10,7 +10,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from TeleBot_by_noPIP.services.day import Day
-from TeleBot_by_noPIP.db_function import today_day
+from TeleBot_by_noPIP.DataBase.db_function import today_day
 
 next_day = today_day() + 1
 current_group = "ІО-11"
