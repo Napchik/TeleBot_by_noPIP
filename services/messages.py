@@ -1,9 +1,10 @@
-#
-# Description: Contains static phrases.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.1
+"""
+    Description: Contains static phrases.
+
+    Author: Ivan Maruzhenko
+
+    version 0.1
+"""
 
 START = "Привіт, я твій бот-помічник.\n Дізнатися, що я можу - /help"
 

@@ -1,9 +1,11 @@
-#
-# Description: Displays the user's schedule for today.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.1
+
+"""
+    Description: Displays the user's schedule for today.
+
+    Author: Ivan Maruzhenko
+
+    version 0.1
+"""
 
 from telegram import Update
 from telegram.ext import ContextTypes

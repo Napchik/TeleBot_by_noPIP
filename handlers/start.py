@@ -1,9 +1,11 @@
-#
-# Description: Bot greeting.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.1
+
+"""
+    Description: Bot greeting.
+
+    Author: Ivan Maruzhenko
+
+    version 0.1
+"""
 
 from TeleBot_by_noPIP.services.messages import START
 
