@@ -1,18 +1,41 @@
 #
-# Description: Display schedule to the user.
+# Description: Description of the Bot work.
 #
 # Author: Ivan Maruzhenko
 #
-# version 0.1
+# version 0.3
+
+import handlers
+import logging
+import os
+
+from dotenv import load_dotenv, find_dotenv
+from telegram.ext import ApplicationBuilder, CommandHandler
+
+load_dotenv(find_dotenv())
+
+API_TOKEN = os.getenv("TOKEN")
+
+# Configure logging
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+COMMAND_HANDLERS = {
+    "start": handlers.start,
+    "today": handlers.today,
+    "tomorrow": handlers.tomorrow,
+    "help": handlers.help
+}
 
 
-def schedule_for_the_day():
-    pass
+def app():
+    """The main function of the program"""
+    application = ApplicationBuilder().token(API_TOKEN).build()
 
+    for command_name, command_handler in COMMAND_HANDLERS.items():
+        application.add_handler(CommandHandler(command_name, command_handler))
 
-def schedule_for_the_week():
-    pass
-
-
-def all_schedule():
-    pass
+    application.run_polling()

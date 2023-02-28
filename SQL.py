@@ -2,20 +2,11 @@
  Description: This file has some functions which
               are used to operate with SQL DataBase.
 
-       DataBase consists of some tables:
-
-           users           -- user_id, user_name,
-           info_users      -- user_id, user_group, schedule_switch
-           list_groups     -- grup
-           schedule        -- grup, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
-           info_professor  -- subject, position, name, grup
-           info_global     -- week
-
-
  Authors: Mikhail Shikalovskyi
 
- version 1.0
+ version 1.2
 """
+
 import sqlite3
 
 
@@ -78,8 +69,8 @@ Examples:
         
     5. INSERTING (UNIQUE) with UPDATING if EXISTS
         
-        filter = "SELECT * FROM Schedule WHERE grup = 'io-13'"
-        action1  = "INSERT INTO {table} ({what}}) VALUES ({val})"
+        filter = "SELECT * FROM Schedule WHERE group_name = 'io-13'"
+        action1  = "INSERT INTO {table} ({what}) VALUES ({val})"
         action2  = "UPDATE {table} SET {what} = {val} WHERE **"
         exist_test_insert(filter, action1, action2) 
 """
