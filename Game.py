@@ -9,46 +9,57 @@ from aiogram import Bot, Dispatcher, types, executor
 from asyncio import sleep
 from dotenv import load_dotenv, find_dotenv
 import os
-
-load_dotenv(find_dotenv())
-
-API_TOKEN = str(os.getenv("TOKEN"))
-
-
-
-users = []
-bot = Bot(API_TOKEN)
-dp = Dispatcher(bot)  # function to get event from user
+import telegram
+from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler,CallbackQueryHandler
+import logging
 
 
 
-@dp.message_handler() # creating decorator to handle the concret message type from user
-async def dice(message: types.Message):
-    await bot.send_message(message.from_user.id, f'Привіт, {message.from_user.username}, давай грати')
+
+# logging.basicConfig(
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     level=logging.INFO
+# )
+
+
+async def dice_game(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id,text="Привіт, давай грати")
     await sleep(1)
-    await bot.send_message(message.from_user.id, 'Ваш кубик підкидається')
-    dice_user = await bot.send_dice(message.from_user.id)
-    print(dice_user)
-    data_user = dice_user['dice']['value']
+    await context.bot.send_message(chat_id=update.effective_chat.id, text='Ви підкидаєте кубик')
+    first_roll = await context.bot.send_dice(chat_id=update.effective_chat.id)
+    first_roll
+    print(first_roll)
+    data_user = first_roll["dice"]["value"]
     await sleep(5)
-    await bot.send_message(message.from_user.id, 'Бот підкидає кубик')
-    dice_bot = await bot.send_dice(message.from_user.id)
-    data_bot = dice_bot['dice']['value']
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text='Бот підкидаєте кубик')
+    second_roll = await context.bot.send_dice(chat_id=update.effective_chat.id)
+    second_roll
+    data_bot = second_roll["dice"]["value"]
     await sleep(5)
-
     if data_bot > data_user:
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text='Ви програли')
 
-        await bot.send_message(message.from_user.id, "Ви програли(")
     elif data_user > data_bot:
-        await  bot.send_message(message.from_user.id, "Вітаю ! Ви виграли")
+        await  context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text='Ви виграли')
+
 
     else:
-        await bot.send_message(message.from_user.id, f"Нічия!")
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text='Нічия')
 
 
 
 
-# start
+# if __name__ == '__main__':
+#     application = ApplicationBuilder().token('Token').build()
+#
+#     start_handler = CommandHandler('start', start)
+#     application.add_handler(start_handler)
+#
+#     application.run_polling()
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+
+
