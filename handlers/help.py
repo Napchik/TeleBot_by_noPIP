@@ -1,9 +1,11 @@
-#
-# Description: Displays basic information to the user about the Bot.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.1
+
+"""
+    Description: Displays basic information to the user about the Bot.
+
+    Author: Ivan Maruzhenko
+
+    version 0.1
+"""
 
 from TeleBot_by_noPIP.services.messages import HELP
 

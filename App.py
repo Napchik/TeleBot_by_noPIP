@@ -1,9 +1,12 @@
-#
-# Description: Description of the Bot work.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.3
+
+"""
+    Description: Description of the Bot work.
+
+    Author: Ivan Maruzhenko
+
+    version 0.4
+
+"""
 
 import handlers
 import logging
@@ -29,6 +32,8 @@ COMMAND_HANDLERS = {
     "tomorrow": handlers.tomorrow,
     "help": handlers.help
 }
+
+delivery_days: tuple[int, ...] = tuple(range(1, 7))
 
 
 def app():

@@ -1,9 +1,11 @@
-#
-# Description: Download the schedule from the DB.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.2
+
+"""
+    Description: Download the schedule from the DB.
+
+    Author: Ivan Maruzhenko
+
+    version 0.2
+"""
 
 from TeleBot_by_noPIP.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
 from dataclasses import dataclass

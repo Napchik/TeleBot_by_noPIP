@@ -1,9 +1,11 @@
-#
-# Description: Represents day timetable.
-#
-# Author: Ivan Maruzhenko
-#
-# version 0.1
+
+"""
+    Description: Represents day timetable.
+
+    Author: Ivan Maruzhenko
+
+    version 0.1
+"""
 
 from TeleBot_by_noPIP.services.lessons import Lesson, Lessons
 
