@@ -1,15 +1,16 @@
 #
-# Description: Display schedule to the user.
+# Description: Description of the Bot work.
 #
 # Author: Ivan Maruzhenko
 #
-# version 0.2
+# version 0.3
 
-
+import handlers
 import logging
-from dotenv import load_dotenv, find_dotenv
 import os
-from aiogram import Bot, Dispatcher, executor, types
+
+from dotenv import load_dotenv, find_dotenv
+from telegram.ext import ApplicationBuilder, CommandHandler
 
 load_dotenv(find_dotenv())
 
@@ -17,34 +18,24 @@ API_TOKEN = os.getenv("TOKEN")
 
 # Configure logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-# Initialize bot and dispatcher
-
-bot = Bot(token=API_TOKEN)
-
-dp = Dispatcher(bot)
-
-
-@dp.message_handler(commands=['start', 'help'])
-async def send_welcome(message: types.Message):
-    """
-
-    This handler will be called when user sends `/start` or `/help` command
-
-    """
-
-    await message.reply("Hi!\nI'm EchoBot!\nPowered by aiogram.")
+COMMAND_HANDLERS = {
+    "start": handlers.start,
+    "today": handlers.today,
+    "tomorrow": handlers.tomorrow,
+    "help": handlers.help
+}
 
 
-@dp.message_handler()
-async def echo(message: types.Message):
-    # old style:
+def app():
+    """The main function of the program"""
+    application = ApplicationBuilder().token(API_TOKEN).build()
 
-    # await bot.send_message(message.chat.id, message.text)
+    for command_name, command_handler in COMMAND_HANDLERS.items():
+        application.add_handler(CommandHandler(command_name, command_handler))
 
-    await message.answer(message.text)
-
-
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    application.run_polling()
