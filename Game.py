@@ -7,20 +7,23 @@
 # a telegram bot dice game
 from aiogram import Bot, Dispatcher, types, executor
 from asyncio import sleep
+from dotenv import load_dotenv, find_dotenv
+import os
 
-bot = Bot('5400848360:AAFakNgh5y2MyS2DVXEoGHvpLuBXSsduOq4')  # creating the bot
-dp = Dispatcher(bot)  # function to get event from user
+load_dotenv(find_dotenv())
+
+API_TOKEN = str(os.getenv("TOKEN"))
+
+
+
 users = []
-def add_user(user):
-    global users
-    users = users + list(user)
-    file = open("users.txt","w+")
-    file.write(users)
-    file.close()
+bot = Bot(API_TOKEN)
+dp = Dispatcher(bot)  # function to get event from user
+
+
 
 @dp.message_handler() # creating decorator to handle the concret message type from user
 async def dice(message: types.Message):
-    users = []
     await bot.send_message(message.from_user.id, f'Привіт, {message.from_user.username}, давай грати')
     await sleep(1)
     await bot.send_message(message.from_user.id, 'Ваш кубик підкидається')
@@ -45,9 +48,7 @@ async def dice(message: types.Message):
 
 
 
-
+# start
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
-
-
