@@ -1,17 +1,13 @@
 """
- Description: This file uses to activate daily functions
+ Description: This file makes upload parsing data to DataBase
 
  Authors: Mikhail Shikalovskyi
 
  version 1.0
 """
-
 import Parsing
-import db_function
-import SQL
-import schedule
+from DataBase import db_function, SQL
 from datetime import datetime
-import time
 
 
 def schedule_info_uploader():
@@ -29,10 +25,3 @@ def schedule_info_uploader():
         filter = f"INSERT INTO log (parsing_time, status) VALUES ('{datetime.now()}', 'FAIL')"
         print(f"Parsing \033[31mFAILED")
     SQL.table_operate(filter)
-
-
-schedule.every().day.at("01:00").do(schedule_info_uploader)
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)

@@ -16,7 +16,7 @@
  version 1.2
 """
 
-import SQL
+import DataBase.SQL as SQL
 from datetime import datetime
 
 
@@ -58,6 +58,13 @@ def users_by_group(group: str) -> list:
     return result
 
 
+def group_by_user(userid: int) -> str:
+    """Function to execute all user_id by group"""
+    filter = f"SELECT group_name FROM info_users WHERE user_id = '{userid}'"
+    result = reformat_str(SQL.execute(filter))
+    return result
+
+
 def all_groups() -> list:
     """Function to execute list of all groups from DataBase"""
     filter = f"SELECT group_name FROM list_groups"
@@ -76,6 +83,7 @@ def professor_by_subject(group: str, subject: str) -> str:
     filter = f"SELECT name FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformat_str(SQL.execute(filter))
     return result
+
 
 def link_by_subject(group: str, subject: str):
     filter = f"SELECT link FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
@@ -115,4 +123,3 @@ def inserter_professor(week: str, group: str, data: list):
                 filter = f"SELECT * FROM info_professor WHERE group_name = '{group}' AND subject = '{subject}'"
                 action1 = f"INSERT INTO info_professor (group_name, subject, name, type) VALUES ('{group}', '{subject}', '{professor}', '{type}')"
                 SQL.exist_test_insert(filter, action1, "")
-
