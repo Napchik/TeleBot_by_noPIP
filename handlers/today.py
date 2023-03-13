@@ -4,13 +4,13 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.1
+    version 0.2
 """
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from TeleBot_by_noPIP.services.day import Day
-from TeleBot_by_noPIP.DataBase.db_function import today_day
+from services.day import Day
+from DataBase.db_function import today_day
 
 current_day = today_day()
 current_group = "ІО-11"
