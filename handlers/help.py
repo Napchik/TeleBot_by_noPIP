@@ -4,10 +4,10 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.1
+    version 0.2
 """
 
-from TeleBot_by_noPIP.services.messages import HELP
+from services.messages import HELP
 
 from telegram import Update
 from telegram.ext import ContextTypes

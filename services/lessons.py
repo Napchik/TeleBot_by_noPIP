@@ -4,10 +4,10 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.2
+    version 0.3
 """
 
-from TeleBot_by_noPIP.DataBase.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
+from DataBase.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
 from dataclasses import dataclass
 
 

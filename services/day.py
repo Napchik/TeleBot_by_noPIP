@@ -4,10 +4,10 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.1
+    version 0.3
 """
 
-from TeleBot_by_noPIP.services.lessons import Lesson, Lessons
+from services.lessons import Lesson, Lessons
 
 
 class Day:

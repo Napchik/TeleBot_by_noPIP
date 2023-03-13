@@ -4,16 +4,16 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.1
+    version 0.2
 """
 
 import telegram
 
 
 from telegram.ext import ContextTypes
-from TeleBot_by_noPIP.services.exceptions import FailedToSend
-from TeleBot_by_noPIP.services.day import Day
-from TeleBot_by_noPIP.DataBase.db_function import today_day, all_groups, users_by_group, group_by_user
+from services.exceptions import FailedToSend
+from services.day import Day
+from DataBase.db_function import today_day, all_groups, users_by_group, group_by_user
 
 current_day = today_day()
 
