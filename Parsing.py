@@ -2,20 +2,27 @@
     Description: File Parsing.py
 
     Contains functionality needed to parse schedule site of KPI using only group name
-    To get a schedule, an object of class Parser should be created and
-    method "parse" called.
+    To get a schedule, an object of class Parser should be created and method "parse" called.
 
     Input: group (str)
-    Output: data (dict)
+    Output: schedule (dict)
 
     Authors: Ivan Skorobagatko
-    Version: 0.2 (beta-debug)
+    Version: 0.3 (beta)
 """
 
 import requests
 import time
 import re
+import logging
+
 from bs4 import BeautifulSoup
+
+# This should be changed in future
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 
 class Parser:
@@ -45,11 +52,11 @@ class Parser:
     def _response_handler(self, url: str, method: str):
         """
             Handles responses from "response" library
-            Can raise exceptions, but not meant to be used anywhere else.
-            Also will raise exception if response has no callback. (For future restart)
+            Can raise exceptions if response wasn't called back in time or
+            function usage was violated.
 
             :param url: url of site to handle (string)
-            :param method: method of request (get() or post() only)
+            :param method: method of request ("get" or "post" only)
         """
         if self.retry_counter > 5:
             raise Exception("Response wasn't handled in time")
@@ -59,26 +66,32 @@ class Parser:
                 self.response = requests.get(url, timeout=5)
                 self.retry_counter = 0
             except requests.exceptions.Timeout:
-                print("Timed out. Retrying...")
-                self.retry_counter += 1
-                time.sleep(0.5)
-                self._response_handler(url, method="get")
+                self._request_retry(url=url, method=method)
         elif method == "post":
             try:
                 if self.payload == {}:
                     raise Exception("[Failure] Payload is empty")
-                # allow_redirects param might be reconsidered in a future versions
                 self.response = requests.post(url, data=self.payload, timeout=5, allow_redirects=False)
                 self.retry_counter = 0
             except requests.exceptions.Timeout:
-                print("Timed out. Retrying...")
-                self.retry_counter += 1
-                time.sleep(0.5)
-                self._response_handler(url, method="post")
+                self._request_retry(url=url, method=method)
         else:
             raise Exception("[Failure] Violation function usage")
 
-    def _payload_creator(self, group: str):
+    def _request_retry(self, url: str, method: str):
+        """
+            Retries connecting to the server.
+            Calls _response_handler()
+
+            :param url: url of site to handle (string)
+            :param method: method of request ("get" or "post" only)
+        """
+        logging.info("Connection was timed out. Retrying...")
+        self.retry_counter += 1
+        time.sleep(0.5)
+        self._response_handler(url=url, method=method)
+
+    def _payload_creator(self, group: str) -> dict:
         """
             Created data for post request
             Needs for at least one response from KPI schedule site
@@ -101,7 +114,7 @@ class Parser:
         for elem in temp_array:
             self.payload[f"{elem[0]}"] = elem[1]
 
-    def _trans_data(self):
+    def _trans_data(self) -> dict:
         """
             Since main parser function goes row by row, the output data will have first classes, then second and so on.
             For DB, it's better to reverse parsed data to be first Monday, then Tuesday and so on.
@@ -148,30 +161,24 @@ class Parser:
                     formatted_data.append((subject, professor, type_of_subject))
             self.data.append(formatted_data)
 
-    def _url_generator(self):
-        """
-            Simple function that makes link to a needed schedule.
-            Might get deleted in future.
-        """
-        self.last_url = "http://epi.kpi.ua" + self.response.headers["Location"]
-
     def parse(self, group: str) -> dict:
         """
             Main parsing function that should be called to get a schedule.
 
-
             :param group: Takes the name of group (str). This should be written in Ukraine language.
-            :return: Returns dictionary with schedule in it.
+            :return: Returns dictionary with schedule if success, otherwise - empty dict.
         """
+        logging.info(f"Started parsing group '{group}'")
         self.parsed_data.clear()
         self._response_handler(url=self.start_url, method="get")
 
         self._payload_creator(group=group)
         self._response_handler(url=self.start_url, method="post")
         if self.response.status_code != 302:
-            raise Exception("Group doesn't exist. Please, check if the name is written properly")
+            logging.critical(f"Group '{group}' doesn't exists")
+            return self.parsed_data
 
-        self._url_generator()
+        self.last_url = "http://epi.kpi.ua" + self.response.headers["Location"]
         self._response_handler(url=self.last_url, method="get")
 
         self._parser(param="table#ctl00_MainContent_FirstScheduleTable tr")
@@ -179,25 +186,5 @@ class Parser:
         self._parser(param="table#ctl00_MainContent_SecondScheduleTable tr")
         self.parsed_data["week2"] = self._trans_data()
 
+        logging.info(f"Group '{group}' has been parsed successful")
         return self.parsed_data
-
-
-# Test section
-# WARNING. This file isn't meant to ever be executable. Section below contains some test-purpose code
-# It will be removed in release version
-
-def test():
-    parser = Parser()
-
-    print(parser.parse(group="ІО-11"))
-    print(parser.parse(group="ІО-12"))
-    print(parser.parse(group="ІО-13"))
-    print(parser.parse(group="ІО-14"))
-    print(parser.parse(group="ІО-15"))
-    print(parser.parse(group="ІО-16"))
-    print(parser.parse(group="ІП-11"))
-    # This code will prompt Exception
-    print(parser.parse(group="IO-13"))
-
-
-# test()
