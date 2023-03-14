@@ -12,7 +12,7 @@ import sqlite3
 
 def connector_base_cursor():
     """Makes connection to DataBase "Bot" """
-    conn = sqlite3.connect("Bot.db", check_same_thread=False)
+    conn = sqlite3.connect("Database/Bot.db", check_same_thread=False)
     cursor = conn.cursor()
     return conn, cursor
 
