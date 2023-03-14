@@ -43,7 +43,7 @@ def games_by_gamer(user_id: int):
 
 
 def update_score_by_user(user_id: int, new_score: int):
-    filter = f"UPDATE game SET total_score = '{new_score}' WHERE user_id = '{user_id}'"
+    filter = f"UPDATE game SET total_score = '{new_score + 1}' WHERE user_id = '{user_id}'"
     SQL.table_operate(filter)
 
 
@@ -56,4 +56,6 @@ def top_gamers():
     filter = f"SELECT total_score, user_name_game, total_games FROM game ORDER BY total_score DESC limit(10)"
     result = reformating_data.reformat_list_3(SQL.execute(filter))
     return result
+
+
 print(top_gamers())
