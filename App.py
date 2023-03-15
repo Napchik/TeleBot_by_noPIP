@@ -1,4 +1,3 @@
-
 """
     Description: Description of the Bot work.
 
@@ -7,6 +6,9 @@
     version 0.4
 
 """
+import datetime
+
+import telegram.ext
 
 import handlers
 import logging
@@ -33,12 +35,17 @@ COMMAND_HANDLERS = {
     "help": handlers.help
 }
 
-delivery_days: tuple[int, ...] = tuple(range(1, 7))
-
 
 def app():
     """The main function of the program"""
-    application = ApplicationBuilder().token(API_TOKEN).build()
+    application = ApplicationBuilder().token(API_TOKEN)
+    settings = telegram.ext.Defaults(tzinfo=datetime.timezone(offset=datetime.timedelta(hours=2)))
+    application.defaults(settings)
+    application = application.build()
+
+    job_queue = application.job_queue
+
+    job_queue.run_daily(handlers.daily_schedule, time=datetime.time(19, 31, 0), days=tuple(range(1, 7)))
 
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
