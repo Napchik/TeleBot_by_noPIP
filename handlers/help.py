@@ -1,4 +1,3 @@
-
 """
     Description: Displays basic information to the user about the Bot.
 

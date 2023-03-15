@@ -1,4 +1,3 @@
-
 """
     Description: Bot greeting.
 

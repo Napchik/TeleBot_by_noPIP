@@ -1,10 +1,9 @@
-
 """
     Description: Download the schedule from the DB.
 
     Author: Ivan Maruzhenko
 
-    version 0.3
+    version 0.4
 """
 
 from DataBase.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
@@ -27,17 +26,22 @@ class Lesson:
                 if link != "":
                     links += f"{link}\n"
         else:
-            links = f"{self.url[0]}"
+            if self.url[0] != "None":
+                links = f"{self.url[0]}"
+            else:
+                links = "Невідомо..."
 
         return links
 
     def __repr__(self):
         """Function to output an instance of a class"""
-        return f"Пара №{self.number}\n\n{self.name}\n{self.professor}\n\n Посилання на пару:\n{self._split_links()}"
+        return f"<b>Пара №{self.number})</b>\n<b><i>{self.name}</i></b>\n<b>Викладач: </b><i>{self.professor}" \
+               f"</i>\n\n<b>Посилання на пару:</b>\n{self._split_links()}\n"
 
 
 class Lessons:
-    """A class for loading lessons from the database and converting them into instances of the Lesson class."""
+    """The class for loading lessons from the database and converting them into instances of the Lesson class."""
+
     def __init__(self, group: str, day: int):
         self.group = group
         self.day = day

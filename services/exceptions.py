@@ -6,10 +6,8 @@
     version 0.1
 """
 
-import logging
-
 import telegram.error
 
 
 class FailedToSend(telegram.error.BadRequest):
-    logging.warning("Raised exception 'FailedToSend'.")
+    pass

@@ -1,4 +1,3 @@
-
 """
     Description: Program entry point.
 
