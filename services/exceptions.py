@@ -1,4 +1,3 @@
-
 """
     Description: File with custom exceptions.
 
@@ -7,8 +6,8 @@
     version 0.1
 """
 
-import logging
+import telegram.error
 
 
-class FailedToSend(Exception):
-    logging.warning("Raised exception 'FailedToSend'.")
+class FailedToSend(telegram.error.BadRequest):
+    pass
