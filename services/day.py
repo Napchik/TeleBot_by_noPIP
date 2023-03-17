@@ -4,7 +4,7 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.3
+    version 0.4
 """
 
 from services.lessons import Lesson, Lessons
@@ -26,5 +26,7 @@ class Day:
         for lesson in self.lessons.get_lessons():
             if lesson.name is not None:
                 result += f"{lesson}\n"
-
-        return result
+        if result != "":
+            return result
+        else:
+            return "В цей день пар немає! Можна відпчивати! ;)"

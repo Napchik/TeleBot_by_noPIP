@@ -3,14 +3,14 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.4
+    version 0.5
 """
 
 from DataBase.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Lesson:
     """Represents a lesson with name, number, professor, and link"""
     number: int
