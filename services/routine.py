@@ -3,7 +3,7 @@
 
     Author: Ivan Maruzhenko
 
-    version 0.1
+    version 0.2
 """
 
 import logging
@@ -15,17 +15,13 @@ from services.day import Day
 from DataBase.db_function import all_groups, users_by_group, group_by_user
 
 
-async def schedule_for_tomorrow(context: ContextTypes.DEFAULT_TYPE):
-    """Sends schedule for tomorrow"""
-    await _routine(context=context, day=next_day)
-
-
 async def routine(context: ContextTypes.DEFAULT_TYPE, day: int):
     """Logic of daily mailings"""
     for user in _get_users_id():
         try:
             await context.bot.send_message(chat_id=user,
-                                           text=Day(group_by_user(user), day).get_all_lessons())
+                                           text=Day(group_by_user(user), day).get_all_lessons(),
+                                           parse_mode=telegram.constants.ParseMode.HTML)
         except telegram.error.BadRequest:
             logging.warning(f"The user with id - {user} not in database!")
             pass
