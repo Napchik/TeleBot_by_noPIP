@@ -2,13 +2,12 @@
     Description: Sends schedule for tomorrow.
 
     Author: Ivan Maruzhenko
-
-    version 0.2
+    Version: 0.2
 """
 
 from telegram.ext import ContextTypes
-from services.routine import routine
-from DataBase.db_function import today_day
+from Services.routine import routine
+from Database.db_function import today_day
 
 
 async def schedule_for_tomorrow(context: ContextTypes.DEFAULT_TYPE):

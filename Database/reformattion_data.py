@@ -1,9 +1,8 @@
 """
-    Description: Reformating received data to some types.
+    Description: Reformatting received data to some types.
 
-    Authors: Mikhail Shikalovskyi
-
-    version 1.0
+    Author: Mikhail Shikalovskyi
+    Version: 1.2
 """
 
 

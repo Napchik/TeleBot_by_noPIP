@@ -2,11 +2,10 @@
     Description: Download the schedule from the DB.
 
     Author: Ivan Maruzhenko
-
-    version 0.5
+    Version: 0.5
 """
 
-from DataBase.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
+from Database.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
 from dataclasses import dataclass
 
 

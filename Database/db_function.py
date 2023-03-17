@@ -1,22 +1,22 @@
 """
- Description: This file has some functions which
-              are used to execute/insert some data from/to DataBase.
+    Description: This file has some functions which
+                 are used to execute/insert some data from/to Database.
 
-       DataBase consists of some tables:
-           log             -- id, parsing_time, status
-           info_global     -- week
-           info_professor  -- group_name, subject, name, type, link
-           info_users      -- user_id, group_name, schedule_switch, status
-           list_groups     -- group_name
-           schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
-           users           -- user_id, user_name,
+          Database consists of some tables:
+              log             -- id, parsing_time, status
+              info_global     -- week
+              info_professor  -- group_name, subject, name, type, link
+              info_users      -- user_id, group_name, schedule_switch, status
+              list_groups     -- group_name
+              schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
+              users           -- user_id, user_name, user_surname, nick_name
+              game            -- user_id, user_name_game, total_score, total_games
 
- Authors: Mikhail Shikalovskyi
-
- version 1.3
+    Author: Mikhail Shikalovskyi
+    Version: 1.4
 """
-import DataBase.reformation_data as reformation_data
-import DataBase.SQL as SQL
+import Database.reformattion_data as reformation_data
+import Database.SQL as SQL
 from datetime import datetime
 
 
@@ -45,7 +45,7 @@ def group_by_user(userid: int) -> str:
 
 
 def all_groups() -> list:
-    """Function to execute list of all groups from DataBase"""
+    """Function to execute list of all groups from Database"""
     filter = f"SELECT group_name FROM list_groups"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
@@ -100,7 +100,7 @@ def inserter_professor(week: str, group: str, data: list):
             if lessons_professors is not None:
                 subject = lessons_professors[0].replace('\'', '`') + " " + lessons_professors[2].replace('\'', '`')
                 professor = lessons_professors[1].replace('\'', '`')
-                type = lessons_professors[2].replace('\'', '`')
+                position = lessons_professors[2].replace('\'', '`')
                 filter = f"SELECT * FROM info_professor WHERE group_name = '{group}' AND subject = '{subject}'"
-                action1 = f"INSERT INTO info_professor (group_name, subject, name, type) VALUES ('{group}', '{subject}', '{professor}', '{type}')"
+                action1 = f"INSERT INTO info_professor (group_name, subject, name, type) VALUES ('{group}', '{subject}', '{professor}', '{position}') "
                 SQL.exist_test_insert(filter, action1, "")

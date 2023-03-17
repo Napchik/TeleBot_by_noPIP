@@ -2,14 +2,13 @@
     Description: Displays the user's schedule for next day.
 
     Author: Ivan Maruzhenko
-
-    version 0.5
+    Version: 0.5
 """
 import telegram.constants
 from telegram import Update
 from telegram.ext import ContextTypes
-from services.day import Day
-from DataBase.db_function import today_day, group_by_user
+from Services.day import Day
+from Database.db_function import today_day, group_by_user
 
 
 async def tomorrow(update: Update, context: ContextTypes.DEFAULT_TYPE):

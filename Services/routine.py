@@ -2,8 +2,7 @@
     Description: Sends daily schedule every day.
 
     Author: Ivan Maruzhenko
-
-    version 0.3
+    Version: 0.3
 """
 
 import logging
@@ -11,8 +10,8 @@ import logging
 import telegram
 
 from telegram.ext import ContextTypes
-from services.day import Day
-from DataBase.db_function import all_groups, users_by_group, group_by_user
+from Services.day import Day
+from Database.db_function import all_groups, users_by_group, group_by_user
 
 
 async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = ""):

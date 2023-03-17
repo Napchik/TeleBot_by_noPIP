@@ -1,18 +1,17 @@
 """
- Description: This file makes upload parsing data to DataBase
+    Description: This file makes upload parsing data to Database
 
- Authors: Mikhail Shikalovskyi
-
- version 1.0
+    Author: Mikhail Shikalovskyi
+    Version: 1.1
 """
-import Parsing
-from DataBase import db_function, SQL
+import parsing
+from Database import db_function, SQL
 from datetime import datetime
 
 
 def schedule_info_uploader():
     try:
-        parser = Parsing.Parser()
+        parser = parsing.Parser()
         list_group = db_function.all_groups()
         for groups in list_group:
             data = parser.parse(group=groups)

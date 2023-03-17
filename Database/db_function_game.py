@@ -1,22 +1,22 @@
 """
- Description: This file has some functions which
-              are used to execute/insert some data from/to DataBase.
+    Description: This file has some functions which
+                 are used to execute/insert some data from/to Database.
 
-       DataBase consists of some tables:
-           log             -- id, parsing_time, status
-           info_global     -- week
-           info_professor  -- group_name, subject, name, type, link
-           info_users      -- user_id, group_name, schedule_switch, status
-           list_groups     -- group_name
-           schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
-           users           -- user_id, user_name,
+          Database consists of some tables:
+              log             -- id, parsing_time, status
+              info_global     -- week
+              info_professor  -- group_name, subject, name, type, link
+              info_users      -- user_id, group_name, schedule_switch, status
+              list_groups     -- group_name
+              schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
+              users           -- user_id, user_name, user_surname, nick_name
+              game            -- user_id, user_name_game, total_score, total_games
 
- Authors: Mikhail Shikalovskyi
-
- version 1.0
+    Author: Mikhail Shikalovskyi
+    Version: 1.1
 """
-import DataBase.SQL as SQL
-import DataBase.reformation_data as reformating_data
+import Database.SQL as SQL
+import Database.reformattion_data as reformating_data
 
 
 def user_check(user_id: int):
@@ -56,6 +56,3 @@ def top_gamers():
     filter = f"SELECT total_score, user_name_game, total_games FROM game ORDER BY total_score DESC limit(10)"
     result = reformating_data.reformat_list_3(SQL.execute(filter))
     return result
-
-
-print(top_gamers())

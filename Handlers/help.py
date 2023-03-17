@@ -2,11 +2,10 @@
     Description: Displays basic information to the user about the Bot.
 
     Author: Ivan Maruzhenko
-
-    version 0.2
+    Version: 0.2
 """
 
-from services.messages import HELP
+from Services.messages import HELP
 
 from telegram import Update
 from telegram.ext import ContextTypes
