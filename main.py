@@ -5,11 +5,10 @@
              Ivan Skorobagatko
              Ivan Maruzhenko
              Evhen Miholat
-
-    version 0.1
+    Version: 0.1
 """
 
-from App import app
+from app import app
 
 if __name__ == '__main__':
     app()

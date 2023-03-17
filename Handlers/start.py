@@ -2,11 +2,10 @@
     Description: Bot greeting.
 
     Author: Ivan Maruzhenko
-
-    version 0.2
+    Version: 0.2
 """
 
-from services.messages import START
+from Services.messages import START
 
 from telegram import Update
 from telegram.ext import ContextTypes

@@ -1,13 +1,11 @@
-
 """
     Description: Represents day timetable.
 
     Author: Ivan Maruzhenko
-
-    version 0.4
+    Version: 0.4
 """
 
-from services.lessons import Lesson, Lessons
+from Services.lessons import Lesson, Lessons
 
 
 class Day:

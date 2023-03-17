@@ -2,13 +2,12 @@
     Description: Sends daily schedule.
 
     Author: Ivan Maruzhenko
-
-    version 0.4
+    Version: 0.4
 """
 
 from telegram.ext import ContextTypes
-from services.routine import routine
-from DataBase.db_function import today_day
+from Services.routine import routine
+from Database.db_function import today_day
 
 
 async def daily_schedule(context: ContextTypes.DEFAULT_TYPE):

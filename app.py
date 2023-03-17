@@ -2,13 +2,12 @@
     Description: Description of the Bot work.
 
     Author: Ivan Maruzhenko
-
-    version 0.5
+    Version: 0.5
 """
 
 import datetime
 import telegram.ext
-import handlers
+import Handlers
 import logging
 import os
 
@@ -27,10 +26,10 @@ logging.basicConfig(
 )
 
 COMMAND_HANDLERS = {
-    "start": handlers.start,
-    "today": handlers.today,
-    "tomorrow": handlers.tomorrow,
-    "help": handlers.help
+    "start": Handlers.start,
+    "today": Handlers.today,
+    "tomorrow": Handlers.tomorrow,
+    "help": Handlers.help
 }
 
 
@@ -40,8 +39,8 @@ def app():
     application = ApplicationBuilder().token(API_TOKEN).defaults(settings).build()
 
     job_queue = application.job_queue
-    job_queue.run_daily(handlers.daily_schedule, time=datetime.time(8, 00, 00), days=tuple(range(1, 7)))
-    job_queue.run_daily(handlers.schedule_for_tomorrow, time=datetime.time(18, 00, 00), days=tuple(range(1, 7)))
+    job_queue.run_daily(Handlers.daily_schedule, time=datetime.time(8, 00, 00), days=tuple(range(1, 7)))
+    job_queue.run_daily(Handlers.schedule_for_tomorrow, time=datetime.time(18, 00, 00), days=tuple(range(1, 7)))
 
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))

@@ -1,9 +1,8 @@
 """
-    Description: Initializes handlers.
+    Description: Initializes Handlers.
 
     Author: Ivan Maruzhenko
-
-    version 0.1
+    Version: 0.1
 """
 
 from .start import start

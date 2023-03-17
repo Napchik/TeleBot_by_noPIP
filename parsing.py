@@ -1,5 +1,5 @@
 """
-    Description: File Parsing.py
+    Description: File parsing.py
 
     Contains functionality needed to parse schedule site of KPI using only group name
     To get a schedule, an object of class Parser should be created and method "parse" called.
