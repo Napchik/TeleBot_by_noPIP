@@ -53,6 +53,8 @@ def all_groups() -> list:
 
 def schedule_day_by_group(group: str, day: int) -> str:
     """Function to execute schedule for special day"""
+    if day == 7 or 14:
+        return ''
     filter = f"SELECT day{day} FROM schedule WHERE group_name = '{group}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
