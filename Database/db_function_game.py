@@ -6,10 +6,10 @@
               log             -- id, parsing_time, status
               info_global     -- week
               info_professor  -- group_name, subject, name, type, link
-              info_users      -- user_id, group_name, schedule_switch, status
+              info_users      -- user_id, user_name, user_surname, nick_name
               list_groups     -- group_name
               schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
-              users           -- user_id, user_name, user_surname, nick_name
+              users           -- user_id, group_name, schedule_switch, status
               game            -- user_id, user_name_game, total_score, total_games
 
     Author: Mikhail Shikalovskyi

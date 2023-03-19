@@ -7,11 +7,19 @@
 """
 
 import sqlite3
+import os
 
 
 def connector_base_cursor():
     """Makes connection to Database "Bot" """
-    conn = sqlite3.connect("Database/Bot.db", check_same_thread=False)
+    folder = os.path.abspath(os.curdir).split("\\")
+    if "Database" in folder or "Handlers" in folder or "Services" in folder:
+        del folder[-1]
+        a = "\\".join(folder)
+        print(a)
+        conn = sqlite3.connect(f"{a}\Bot.db", check_same_thread=False)
+    else:
+        conn = sqlite3.connect("Bot.db", check_same_thread=False)
     cursor = conn.cursor()
     # exception!!! Can't connect to Database
     return conn, cursor
