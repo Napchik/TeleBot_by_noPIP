@@ -20,22 +20,25 @@ class Lesson:
     def _split_links(self):
         """Checks if there are more links than one and separates them"""
         links = ""
-        if len(self.url) > 1:
-            for link in self.url:
-                if link != "":
-                    links += f"{link}\n"
-        else:
-            if self.url[0] != "None":
-                links = f"{self.url[0]}"
+        if self.url is not None:
+            if len(self.url) > 1:
+                for link in self.url:
+                    if link != "":
+                        links += f"{link}\n"
             else:
-                links = "Невідомо..."
+                if self.url[0] != "None":
+                    links = f"{self.url[0]}"
+                else:
+                    links = "Невідомо..."
 
-        return links
+            return links
+        else:
+            return None
 
     def __repr__(self):
         """Function to output an instance of a class"""
-        return f"<b>Пара №{self.number})</b>\n<b><i>{self.name}</i></b>\n<b>Викладач: </b><i>{self.professor}" \
-               f"</i>\n\n<b>Посилання на пару:</b>\n{self._split_links()}\n"
+        return f"Пара №{self.number})\n{self.name}\nВикладач: {self.professor}" \
+               f"\n\nПосилання на пару:\n{self._split_links()}\n"
 
 
 class Lessons:
@@ -54,7 +57,8 @@ class Lessons:
 
     def _load_lessons(self) -> list[Lesson] | None:
         """Converting Input Data to Lesson Class Instances"""
-        if self.data is None:
+
+        if self.data != "":
             return None
 
         data = self._split_input()
@@ -71,6 +75,10 @@ class Lessons:
                            link_by_subject(self.group, i).split(", ")))
         return list_of_items
 
-    def get_lessons(self) -> list[Lesson]:
+    def get_lesson(self, number: int) -> Lesson:
+        """Returns a specific lesson by number"""
+        return self.lessons[number - 1]
+
+    def get_all_lessons(self) -> list[Lesson]:
         """Returns all lessons for the day"""
         return self.lessons

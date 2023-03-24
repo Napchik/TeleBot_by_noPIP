@@ -10,7 +10,7 @@ import logging
 import telegram
 
 from telegram.ext import ContextTypes
-from Services.day import Day
+from Services.schedulebuilder import ScheduleBuilder
 from Database.db_function import all_groups, users_by_group, group_by_user
 
 
@@ -19,7 +19,7 @@ async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = "")
     for user in _get_users_id():
         try:
             await context.bot.send_message(chat_id=user,
-                                           text=title + Day(group_by_user(user), day).get_all_lessons(),
+                                           text=title + ScheduleBuilder(group_by_user(user), day).build_text(),
                                            parse_mode=telegram.constants.ParseMode.HTML)
         except telegram.error.BadRequest:
             logging.warning(f"The user, with id - {user}, did not start a chat with the bot.")
