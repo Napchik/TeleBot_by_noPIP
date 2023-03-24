@@ -32,14 +32,14 @@ def today_day() -> int:
 
 def users_by_group(group: str) -> list:
     """Function to execute all user_id by group"""
-    filter = f"SELECT user_id FROM info_users WHERE group_name = '{group}'"
+    filter = f"SELECT user_id FROM users WHERE group_name = '{group}'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
 
 
 def group_by_user(userid: int) -> str:
     """Function to execute all user_id by group"""
-    filter = f"SELECT group_name FROM info_users WHERE user_id = '{userid}'"
+    filter = f"SELECT group_name FROM users WHERE user_id = '{userid}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
@@ -53,7 +53,7 @@ def all_groups() -> list:
 
 def schedule_day_by_group(group: str, day: int) -> str:
     """Function to execute schedule for special day"""
-    if day == 7 or 14:
+    if day == 7 or day == 14:
         return ''
     filter = f"SELECT day{day} FROM schedule WHERE group_name = '{group}'"
     result = reformation_data.reformat_str(SQL.execute(filter))

@@ -22,13 +22,16 @@ import Database.SQL as SQL
 def check_user(user_id: int):
     filter = f"SELECT * FROM users WHERE user_id = '{user_id}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
-    if bool(result) is False:
-        return False
-    else:
-        return True
+    return bool(result)
 
 
 def update_schedule_switch(user_id: int, schedule_switch: int):
     if check_user(user_id) is True:
         filter = f"UPDATE users SET schedule_switch = '{schedule_switch}' WHERE user_id = '{user_id}'"
+        SQL.table_operate(filter)
+
+
+def change_group(user_id: int, group_name: str):
+    if check_user(user_id) is True:
+        filter = f"UPDATE users SET group_name = '{group_name}' WHERE user_id = '{user_id}'"
         SQL.table_operate(filter)
