@@ -16,7 +16,6 @@ def connector_base_cursor():
     if "Database" in folder or "Handlers" in folder or "Services" in folder:
         del folder[-1]
         a = "\\".join(folder)
-        print(a)
         conn = sqlite3.connect(f"{a}\Bot.db", check_same_thread=False)
     else:
         conn = sqlite3.connect("Bot.db", check_same_thread=False)
