@@ -10,7 +10,7 @@ import telegram
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, CallbackQueryHandler, ConversationHandler, \
     MessageHandler, filters
 import logging
-from Database.db_function_game import user_check, update_score_by_user, add_new_gamer, update_games_by_user, \
+from DataBase.db_function_game import user_check, update_score_by_user, add_new_gamer, update_games_by_user, \
     score_by_gamer, games_by_gamer, top_gamers
 
 
@@ -18,6 +18,7 @@ from Database.db_function_game import user_check, update_score_by_user, add_new_
 #     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 #     level=logging.INFO
 # )
+
 async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.id
     if user_check(name):
@@ -35,22 +36,23 @@ async def add_gamer(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE)
     add_new_gamer(update.effective_user.id, user_name)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Ви успішно додані списку гравців, тепер ви можете відслідковувати свій рейтинг серед всіх участників гри."
-                                        f"{user_name}починаємо грати ?")
+                                        f" {user_name}, починаємо грати ?")
     return 2
 
 
 async def dice_game(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
     user_answer = update.message.text
     if user_answer.lower() == 'так':
-        await context.bot.send_message(chat_id=update.effective_chat.id, text='Ви підкидаєте кубик')
-        first_roll = await context.bot.send_dice(chat_id=update.effective_chat.id)
-        data_user = first_roll["dice"]["value"]
+
+        async def roll_dice(chat_id, message) -> int:
+            await context.bot.send_message(chat_id=chat_id, text=message)
+            data = await context.bot.send_dice(chat_id=chat_id)
+            return data["dice"]["value"]
+
+        data_user = await roll_dice(update.effective_chat.id,'Ви підкидаєте кубик')
         await sleep(5)
-        await context.bot.send_message(chat_id=update.effective_chat.id,
-                                       text='Бот підкидаєте кубик')
-        second_roll = await context.bot.send_dice(chat_id=update.effective_chat.id)
-        data_bot = second_roll["dice"]["value"]
-        await sleep(5)
+        data_bot = await roll_dice(update.effective_chat.id,'Бот підкидає кубик')
+        await sleep(4)
         if data_bot > data_user:
             await context.bot.send_message(chat_id=update.effective_chat.id,
                                            text='Ви програли')
@@ -64,9 +66,7 @@ async def dice_game(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE)
         elif data_user > data_bot:
             await  context.bot.send_message(chat_id=update.effective_chat.id,
                                             text='Ви виграли')
-            wins_by_user = score_by_gamer(update.effective_user.id)
-            wins_by_user += 1
-            update_score_by_user(update.effective_user.id, wins_by_user)
+            update_score_by_user(update.effective_user.id,  score_by_gamer(update.effective_user.id))
             update_games_by_user(update.effective_user.id, games_by_gamer(update.effective_user.id))
             games = games_by_gamer(update.effective_user.id)
             await context.bot.send_message(chat_id=update.effective_chat.id,
@@ -76,6 +76,7 @@ async def dice_game(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE)
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id,
                                            text='Нічия')
+
             update_games_by_user(update.effective_user.id, games_by_gamer(update.effective_user.id))
             games = games_by_gamer(update.effective_user.id)
             await context.bot.send_message(chat_id=update.effective_chat.id,
@@ -111,7 +112,7 @@ conv_handler = ConversationHandler(entry_points=[CommandHandler('start', start)]
                                    fallbacks=[CommandHandler('stop', stop)])
 
 # if __name__ == '__main__':
-#     application = ApplicationBuilder().token('5400848360:AAFakNgh5y2MyS2DVXEoGHvpLuBXSsduOq4').build()
+#     application = ApplicationBuilder().token('token').build()
 #
 #     start_handler = CommandHandler('start', start)
 #     top_handler = CommandHandler('top', gamers_top)
