@@ -2,7 +2,7 @@
     Description: Sends daily schedule every day.
 
     Author: Ivan Maruzhenko
-    Version: 0.3
+    Version: 0.4
 """
 
 import logging
@@ -10,17 +10,20 @@ import logging
 import telegram
 
 from telegram.ext import ContextTypes
-from Services.schedulebuilder import ScheduleBuilder
-from Database.db_function import all_groups, users_by_group, group_by_user
+from Services.schedule_builder import ScheduleBuilder
+from Database.db_function import all_groups, users_by_group
 
 
 async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = ""):
     """Logic of daily mailings"""
+
     for user in _get_users_id():
+        schedule = ScheduleBuilder(user, day)
         try:
             await context.bot.send_message(chat_id=user,
-                                           text=title + ScheduleBuilder(group_by_user(user), day).build_text(),
-                                           parse_mode=telegram.constants.ParseMode.HTML)
+                                           text=schedule.build_text(title=title),
+                                           parse_mode=telegram.constants.ParseMode.HTML,
+                                           reply_markup=schedule.build_markup())
         except telegram.error.BadRequest:
             logging.warning(f"The user, with id - {user}, did not start a chat with the bot.")
             pass

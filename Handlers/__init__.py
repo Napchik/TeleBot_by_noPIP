@@ -2,9 +2,8 @@
     Description: Initializes Handlers.
 
     Author: Ivan Maruzhenko
-    Version: 0.1
+    Version: 0.2
 """
 
 from .commands import start, help, today, tomorrow
-from .daily_schedule import daily_schedule
-from .schedule_for_tomorrow import schedule_for_tomorrow
+from .queue import daily_schedule, schedule_for_tomorrow

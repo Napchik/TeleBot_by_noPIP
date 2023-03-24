@@ -2,43 +2,23 @@
     Description: Download the schedule from the DB.
 
     Author: Ivan Maruzhenko
-    Version: 0.5
+    Version: 0.6
 """
 
 from Database.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
 from dataclasses import dataclass
+
+timetable = ("08:30 - 10:05", "10:25 - 12:00", "12:20 - 13:55", "14:15 - 15:50", "16:10 - 17:45", "18:30 - 20:05")
 
 
 @dataclass(frozen=True, slots=True)
 class Lesson:
     """Represents a lesson with name, number, professor, and link"""
     number: int
+    time: str = None
     name: str = None
     professor: str = None
     url: list[str] = None
-
-    def _split_links(self):
-        """Checks if there are more links than one and separates them"""
-        links = ""
-        if self.url is not None:
-            if len(self.url) > 1:
-                for link in self.url:
-                    if link != "":
-                        links += f"{link}\n"
-            else:
-                if self.url[0] != "None":
-                    links = f"{self.url[0]}"
-                else:
-                    links = "Невідомо..."
-
-            return links
-        else:
-            return None
-
-    def __repr__(self):
-        """Function to output an instance of a class"""
-        return f"Пара №{self.number})\n{self.name}\nВикладач: {self.professor}" \
-               f"\n\nПосилання на пару:\n{self._split_links()}\n"
 
 
 class Lessons:
@@ -55,11 +35,8 @@ class Lessons:
         self.data = self.data.split("; ")
         return self.data
 
-    def _load_lessons(self) -> list[Lesson] | None:
+    def _load_lessons(self) -> list[Lesson]:
         """Converting Input Data to Lesson Class Instances"""
-
-        if self.data != "":
-            return None
 
         data = self._split_input()
 
@@ -71,8 +48,8 @@ class Lessons:
                 list_of_items.append(Lesson(c + 1))
             else:
                 list_of_items.append(
-                    Lesson(c + 1, i, professor_by_subject(self.group, i),
-                           link_by_subject(self.group, i).split(", ")))
+                    Lesson(number=c + 1, time=timetable[c], name=i, professor=professor_by_subject(self.group, i),
+                           url=link_by_subject(self.group, i).split(", ")))
         return list_of_items
 
     def get_lesson(self, number: int) -> Lesson:
