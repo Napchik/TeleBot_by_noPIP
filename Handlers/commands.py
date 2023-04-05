@@ -2,19 +2,16 @@
     Description: Processes user commands.
 
     Author: Ivan Maruzhenko
-    Version: 0.1
+    Version: 0.2
 """
-from Services.messages import START, HELP
+
 import telegram.constants
+
+from Services.messages import START, HELP
 from telegram import Update
 from telegram.ext import ContextTypes
 from Services.schedule_builder import ScheduleBuilder
 from Database.db_function import today_day
-
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Displays the first welcome message for the user"""
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=START)
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
