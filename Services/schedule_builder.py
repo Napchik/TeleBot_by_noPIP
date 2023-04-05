@@ -2,12 +2,12 @@
     Description: Represents day timetable.
 
     Author: Ivan Maruzhenko
-    Version: 0.5
+    Version: 0.6
 """
 
 from Services.lessons import Lessons
 from Database.db_function import group_by_user
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 class ScheduleBuilder:
@@ -27,7 +27,9 @@ class ScheduleBuilder:
 
         for lesson in self.__lessons.get_all_lessons():
             if lesson.name is not None:
-                text += f"{lesson.number}) <I>{lesson.time}</I>\n<B><I>{lesson.name}</I></B>\n<I>{lesson.professor}</I>\n\n"
+                text += f"{lesson.number}) <I>{lesson.time}</I>" \
+                        f"\n\n<B><I>{lesson.name}</I></B>" \
+                        f"\n<I>{lesson.professor}</I>\n\n"
 
         if text != "":
             return title + text

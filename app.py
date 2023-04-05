@@ -2,13 +2,12 @@
     Description: Description of the Bot work.
 
     Author: Ivan Maruzhenko
-    Version: 0.5
+    Version: 0.6
 """
 
 import datetime
 import telegram.ext
 import Handlers
-import logging
 import os
 
 from dotenv import load_dotenv, find_dotenv
@@ -18,15 +17,7 @@ load_dotenv(find_dotenv())
 
 API_TOKEN = os.getenv("TOKEN")
 
-# Configure logging
-
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
 COMMAND_HANDLERS = {
-    "start": Handlers.start,
     "today": Handlers.today,
     "tomorrow": Handlers.tomorrow,
     "help": Handlers.help
@@ -44,5 +35,7 @@ def app():
 
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
+
+    application.add_handler(Handlers.CONVERSATION_HANDLER)
 
     application.run_polling()

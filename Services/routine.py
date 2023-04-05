@@ -2,13 +2,12 @@
     Description: Sends daily schedule every day.
 
     Author: Ivan Maruzhenko
-    Version: 0.4
+    Version: 0.5
 """
-
-import logging
 
 import telegram
 
+from loger_config import logger
 from telegram.ext import ContextTypes
 from Services.schedule_builder import ScheduleBuilder
 from Database.db_function import all_groups, users_by_group
@@ -25,10 +24,10 @@ async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = "")
                                            parse_mode=telegram.constants.ParseMode.HTML,
                                            reply_markup=schedule.build_markup())
         except telegram.error.BadRequest:
-            logging.warning(f"The user, with id - {user}, did not start a chat with the bot.")
+            logger.warning(f"The user, with id - {user}, did not start a chat with the bot.")
             pass
         except telegram.error.Forbidden:
-            logging.warning(f"The user, with id - {user}, blocked the bot.")
+            logger.warning(f"The user, with id - {user}, blocked the bot.")
             pass
 
 
