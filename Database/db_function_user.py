@@ -19,10 +19,48 @@ import Database.reformattion_data as reformation_data
 import Database.SQL as SQL
 
 
+def check_group(group: str):
+    filter = f"SELECT * FROM list_groups WHERE group_name = '{group}'"
+    result = reformation_data.reformat_str(SQL.execute(filter))
+    return bool(result)
+
+
 def check_user(user_id: int):
     filter = f"SELECT * FROM users WHERE user_id = '{user_id}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return bool(result)
+
+
+def check_user_role(user_id: int):
+    filter = f"SELECT role FROM users WHERE user_id = '{user_id}'"
+    result = reformation_data.reformat_str(SQL.execute(filter))
+    return result
+
+
+def choose_role(group_name: str):
+    filter = f"SELECT user_id FROM users WHERE group_name = '{group_name}'"
+    result = reformation_data.reformat_list(SQL.execute(filter))
+    if len(result) < 3:
+        return "moderator"
+    else:
+        return "user"
+
+
+def check_user_group(user_id: int):
+    filter = f"SELECT group_name FROM users WHERE user_id = '{user_id}'"
+    result = reformation_data.reformat_str(SQL.execute(filter))
+    return result
+
+
+def add_user(user_name: str, user_surname: str, user_nickname: str, user_id: int, user_group: str, user_schedule: int,
+             user_role: str):
+    filter = f"INSERT INTO users (user_id, group_name, schedule_switch, role) VALUES ({user_id}, {user_group}, {user_schedule},{user_role})"
+    SQL.table_operate(filter)
+    filter = f"INSERT INTO info_users (user_id, user_name, user_surname, user_nickname) VALUES ({user_id}, {user_name}, {user_surname},{user_nickname})"
+    SQL.table_operate(filter)
+    if check_group(user_group) is False:
+        filter = f"INSERT INTO list_groups (group_name) VALUES ({user_group})"
+        SQL.table_operate(filter)
 
 
 def update_schedule_switch(user_id: int, schedule_switch: int):

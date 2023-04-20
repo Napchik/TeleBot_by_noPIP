@@ -43,12 +43,12 @@ def games_by_gamer(user_id: int):
 
 
 def update_score_by_user(user_id: int, new_score: int):
-    filter = f"UPDATE game SET total_score = '{new_score + 1}' WHERE user_id = '{user_id}'"
+    filter = f"UPDATE game SET total_score = '{new_score}' WHERE user_id = '{user_id}'"
     SQL.table_operate(filter)
 
 
 def update_games_by_user(user_id: int, new_games: int):
-    filter = f"UPDATE game SET total_games = '{new_games + 1}' WHERE user_id = '{user_id}'"
+    filter = f"UPDATE game SET total_games = '{new_games}' WHERE user_id = '{user_id}'"
     SQL.table_operate(filter)
 
 

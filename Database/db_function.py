@@ -72,6 +72,12 @@ def link_by_subject(group: str, subject: str):
     return result
 
 
+def time_by_number(number: int):
+    filter = f"SELECT time_lesson{number} FROM info_global"
+    result = reformation_data.reformat_str(SQL.execute(filter))
+    return result
+
+
 def inserter_schedule(week: str, group: str, data: list):
     """Function inserts or updates schedule for a group"""
     if week == "week1":
