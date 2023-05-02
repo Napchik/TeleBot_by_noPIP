@@ -25,9 +25,15 @@ REGISTRATION_INFO: str = "<b>Вдалого користування!</b>" \
 
 @dataclass(slots=True, frozen=True)
 class Answers:
-    NO: str = "Ні"
-    MORNING: str = "Лише зранку"
-    ALL: str = "Зранку та ввечері"
+    REG_NO: str = "Ні"
+    REG_MORNING: str = "Лише зранку"
+    REG_ALL: str = "Зранку та ввечері"
+
+    MAIN_SCHEDULE: str = "Розклад"
+    MAIN_GAME: str = "Гра"
+    MAIN_SETTINGS: str = "Налаштування"
+    MAIN_INFO: str = "Корисна Інформація"
+    MAIN_CONTROLS: str = "Керування"
 
 
 @dataclass(slots=True, frozen=True)

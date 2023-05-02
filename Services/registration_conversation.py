@@ -14,7 +14,7 @@ from telegram.ext import (
     ConversationHandler
 )
 
-GROUP, ROUTINE, INFO = map(chr, range(3))
+GROUP, ROUTINE, REG_INFO = map(chr, range(3))
 answers = RoutineChoice.Answers
 results = RoutineChoice.Results
 
@@ -33,9 +33,9 @@ async def group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     group_name: str = update.message.text
 
-    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.NO),
-                                         KeyboardButton(text=answers.MORNING),
-                                         KeyboardButton(text=answers.ALL)]], one_time_keyboard=True,
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.REG_NO),
+                                         KeyboardButton(text=answers.REG_MORNING),
+                                         KeyboardButton(text=answers.REG_ALL)]], one_time_keyboard=True,
                                        resize_keyboard=True)
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has selected the group {group_name}.")
@@ -59,14 +59,14 @@ async def routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user is choosing routine.")
 
-    if answer == "Ні":
-        await update.message.reply_text(text=results.NO, parse_mode=ParseMode.HTML, reply_markup=markup)
-    elif answer == "Лише зранку":
-        await update.message.reply_text(text=results.MORNING, parse_mode=ParseMode.HTML, reply_markup=markup)
-    elif answer == "Зранку та ввечері":
-        await update.message.reply_text(text=results.ALL, parse_mode=ParseMode.HTML, reply_markup=markup)
+    if answer == answers.REG_NO:
+        await update.message.reply_text(text=results.REG_NO, parse_mode=ParseMode.HTML, reply_markup=markup)
+    elif answer == answers.REG_MORNING:
+        await update.message.reply_text(text=results.REG_MORNING, parse_mode=ParseMode.HTML, reply_markup=markup)
+    elif answer == answers.REG_ALL:
+        await update.message.reply_text(text=results.REG_ALL, parse_mode=ParseMode.HTML, reply_markup=markup)
 
-    return INFO
+    return REG_INFO
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
