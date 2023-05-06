@@ -2,7 +2,7 @@
     Description: Contains static phrases.
 
     Author: Ivan Maruzhenko
-    Version: 0.2
+    Version: 0.3
 """
 
 from dataclasses import dataclass
@@ -25,6 +25,9 @@ REGISTRATION_INFO: str = "<b>Вдалого користування!</b>" \
 
 @dataclass(slots=True, frozen=True)
 class Answers:
+
+    BACK: str = "Повернутися"
+
     REG_NO: str = "Ні"
     REG_MORNING: str = "Лише зранку"
     REG_ALL: str = "Зранку та ввечері"
@@ -34,6 +37,19 @@ class Answers:
     MAIN_SETTINGS: str = "Налаштування"
     MAIN_INFO: str = "Корисна Інформація"
     MAIN_CONTROLS: str = "Керування"
+
+    SCHEDULE_TODAY: str = "Сьогодні"
+    SCHEDULE_TOMORROW: str = "Завтра"
+    SCHEDULE_WEEK: str = "Поточний тиждень"
+    SCHEDULE_ALL: str = "Весь Розклад"
+
+    SET_SCHEDULE: str = "ON/OFF Розклад"
+    SET_TIME: str = "Змінити час розсилки"
+    SET_GROUP: str = "Змінити групу"
+    SET_BUG: str = "Повідомити про помилку"
+
+    CONTROLS_LINKS: str = "Змінити посилання на пару"
+    CONTROLS_ROLE: str = "Передати роль модератора"
 
 
 @dataclass(slots=True, frozen=True)
