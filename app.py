@@ -2,7 +2,7 @@
     Description: Description of the Bot work.
 
     Author: Ivan Maruzhenko
-    Version: 0.6
+    Version: 0.7
 """
 
 import datetime
@@ -23,6 +23,8 @@ COMMAND_HANDLERS = {
     "help": Handlers.help
 }
 
+CONVERSATION_HANDLERS = (Handlers.REGISTRATION_CONVERSATION, Handlers.MAIN_CONVERSATION)
+
 
 def app():
     """The main function of the program"""
@@ -36,6 +38,7 @@ def app():
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
 
-    application.add_handler(Handlers.CONVERSATION_HANDLER)
+    for conversation in CONVERSATION_HANDLERS:
+        application.add_handler(conversation)
 
     application.run_polling()
