@@ -27,10 +27,12 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started main conversation.")
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE),
-                                         KeyboardButton(text=answers.MAIN_GAME),
-                                         KeyboardButton(text=answers.MAIN_SETTINGS),
-                                         KeyboardButton(text=answers.MAIN_INFO),
-                                         KeyboardButton(text=answers.MAIN_CONTROLS)]],
+                                         KeyboardButton(text=answers.MAIN_INFO)],
+
+                                        [KeyboardButton(text=answers.MAIN_SETTINGS),
+                                         KeyboardButton(text=answers.MAIN_CONTROLS)],
+
+                                        [KeyboardButton(text=answers.MAIN_GAME)]],
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
 
@@ -47,10 +49,12 @@ async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started schedule conversation.")
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.SCHEDULE_TODAY),
-                                         KeyboardButton(text=answers.SCHEDULE_TOMORROW),
-                                         KeyboardButton(text=answers.SCHEDULE_WEEK),
-                                         KeyboardButton(text=answers.SCHEDULE_ALL),
-                                         KeyboardButton(text=answers.BACK)]],
+                                         KeyboardButton(text=answers.SCHEDULE_TOMORROW)],
+
+                                        [KeyboardButton(text=answers.SCHEDULE_WEEK),
+                                         KeyboardButton(text=answers.SCHEDULE_ALL)],
+
+                                        [KeyboardButton(text=answers.BACK)]],
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
 
@@ -76,10 +80,12 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started settings conversation.")
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.SET_SCHEDULE),
-                                         KeyboardButton(text=answers.SET_TIME),
-                                         KeyboardButton(text=answers.SET_GROUP),
-                                         KeyboardButton(text=answers.SET_BUG),
-                                         KeyboardButton(text=answers.BACK)]],
+                                         KeyboardButton(text=answers.SET_TIME)],
+
+                                        [KeyboardButton(text=answers.SET_GROUP),
+                                         KeyboardButton(text=answers.SET_BUG)],
+
+                                        [KeyboardButton(text=answers.BACK)]],
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
 
@@ -104,8 +110,9 @@ async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started controls conversation.")
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.CONTROLS_LINKS),
-                                         KeyboardButton(text=answers.CONTROLS_ROLE),
-                                         KeyboardButton(text=answers.BACK)]],
+                                         KeyboardButton(text=answers.CONTROLS_ROLE)],
+
+                                        [KeyboardButton(text=answers.BACK)]],
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
 

@@ -32,14 +32,17 @@ from Services.main_conversation import (
     controls
 )
 
-from Services.messages import RoutineChoice
+from Services.schedule_update_conversation import (CHANGE_DAY, send_week_schedule, next_day, previous_day)
 
 from telegram.ext import (
     ConversationHandler,
     MessageHandler,
+    CallbackQueryHandler,
     CommandHandler,
     filters
 )
+
+from Services.messages import RoutineChoice
 
 import Handlers
 
@@ -53,7 +56,8 @@ REGISTRATION_CONVERSATION = ConversationHandler(entry_points=[CommandHandler("st
                                                     ROUTINE: [
                                                         MessageHandler(
                                                             filters.Regex(
-                                                                f"({answers.REG_NO})|({answers.REG_MORNING})|({answers.REG_ALL})"),
+                                                                f"({answers.REG_NO})|({answers.REG_MORNING})|"
+                                                                f"({answers.REG_ALL})"),
                                                             routine)],
 
                                                     REG_INFO: [
@@ -62,6 +66,18 @@ REGISTRATION_CONVERSATION = ConversationHandler(entry_points=[CommandHandler("st
                                                     CommandHandler("cancel", cancel),
                                                     MessageHandler(filters.Regex("(Скасувати)"), cancel),
                                                     MessageHandler(filters.TEXT, misunderstand)])
+
+
+SCHEDULE_UPDATE_CONVERSATION = ConversationHandler(entry_points=[CommandHandler("week", send_week_schedule)],
+                                                   allow_reentry=True, conversation_timeout=60,
+
+                                                   states={
+                                                       CHANGE_DAY: [
+                                                           CallbackQueryHandler(previous_day, pattern="back"),
+                                                           CallbackQueryHandler(next_day, pattern="forward")]},
+
+                                                   fallbacks=[MessageHandler(filters.TEXT, misunderstand)])
+
 
 MAIN_CONVERSATION = ConversationHandler(entry_points=[CommandHandler("menu", start_main)], allow_reentry=True,
                                         states={
@@ -78,13 +94,13 @@ MAIN_CONVERSATION = ConversationHandler(entry_points=[CommandHandler("menu", sta
                                                        MessageHandler(filters.Regex(f"{answers.SCHEDULE_TOMORROW}"),
                                                                       Handlers.tomorrow)]},
 
-                                            # GAME: [],
-                                            #
-                                            # SETTINGS: [],
-                                            #
-                                            # MAIN_INFO: [],
-                                            #
-                                            # CONTROLS: []},
+                                        # GAME: [],
+                                        #
+                                        # SETTINGS: [],
+                                        #
+                                        # MAIN_INFO: [],
+                                        #
+                                        # CONTROLS: []},
 
                                         fallbacks=[
                                             MessageHandler(filters.Regex(f"{answers.BACK}"), start_main),

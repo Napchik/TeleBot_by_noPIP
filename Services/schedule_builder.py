@@ -2,7 +2,7 @@
     Description: Represents day timetable.
 
     Author: Ivan Maruzhenko
-    Version: 0.6
+    Version: 0.7
 """
 
 from Services.lessons import Lessons
@@ -36,14 +36,30 @@ class ScheduleBuilder:
         else:
             return title + "В цей день пар немає! Можна відпчивати! ;)"
 
-    def build_markup(self) -> InlineKeyboardMarkup:
+    def build_keyboard(self) -> InlineKeyboardMarkup:
         """Builds the keyboard with links to lessons"""
-        keyboard: list[InlineKeyboardButton] = []
+
+        keyboard = self._build_markup()
+
+        return InlineKeyboardMarkup(keyboard)
+
+    def build_extended_keyboard(self) -> InlineKeyboardMarkup:
+        """Builds the extended keyboard with links to lessons"""
+
+        extended_keyboard = self._build_markup()
+        extended_keyboard.append([InlineKeyboardButton(text="<", callback_data="back"),
+                                  InlineKeyboardButton(text=">", callback_data="forward")])
+
+        return InlineKeyboardMarkup(extended_keyboard)
+
+    def _build_markup(self):
+        """Builds the array with links to lessons"""
+        markup: list[[InlineKeyboardButton]] = []
 
         for lesson in self.__lessons.get_all_lessons():
             if lesson.name is not None:
                 for url in lesson.url:
                     if url != "None":
-                        keyboard.append(InlineKeyboardButton(f"{lesson.number}) {lesson.name}", url=url))
+                        markup.append([InlineKeyboardButton(f"{lesson.number}) {lesson.name}", url=url)])
 
-        return InlineKeyboardMarkup([[button] for button in keyboard])
+        return markup

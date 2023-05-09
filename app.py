@@ -2,7 +2,7 @@
     Description: Description of the Bot work.
 
     Author: Ivan Maruzhenko
-    Version: 0.7
+    Version: 0.71
 """
 
 import datetime
@@ -23,7 +23,8 @@ COMMAND_HANDLERS = {
     "help": Handlers.help
 }
 
-CONVERSATION_HANDLERS = (Handlers.REGISTRATION_CONVERSATION, Handlers.MAIN_CONVERSATION)
+CONVERSATION_HANDLERS = (
+    Handlers.REGISTRATION_CONVERSATION, Handlers.MAIN_CONVERSATION, Handlers.SCHEDULE_UPDATE_CONVERSATION)
 
 
 def app():
