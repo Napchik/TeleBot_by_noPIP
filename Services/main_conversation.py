@@ -8,13 +8,10 @@
 from telegram.constants import ParseMode
 from loger_config import logger
 from Services.messages import RoutineChoice
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
-from telegram.ext import (
-    ContextTypes,
-    ConversationHandler
-)
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram.ext import ContextTypes, ConversationHandler
 
-MENU, SCHEDULE, GAME, SETTINGS, MAIN_INFO, CONTROLS = map(chr, range(6))
+MENU, SCHEDULE, GAME, SETTINGS, CONTROLS = map(chr, range(3, 8))
 
 answers = RoutineChoice.Answers
 
@@ -27,10 +24,9 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started main conversation.")
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE),
-                                         KeyboardButton(text=answers.MAIN_INFO)],
+                                         KeyboardButton(text=answers.MAIN_SETTINGS)],
 
-                                        [KeyboardButton(text=answers.MAIN_SETTINGS),
-                                         KeyboardButton(text=answers.MAIN_CONTROLS)],
+                                        [KeyboardButton(text=answers.MAIN_CONTROLS)],
 
                                         [KeyboardButton(text=answers.MAIN_GAME)]],
                                        one_time_keyboard=True,
@@ -43,10 +39,11 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Returned the keyboard with schedule options"""
     user = update.message.from_user
     answer = update.message.text
 
-    logger.info(f"User: {user.username}, user_id: {user.id}. The user has started schedule conversation.")
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user has asked to go to schedule conversation.")
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.SCHEDULE_TODAY),
                                          KeyboardButton(text=answers.SCHEDULE_TOMORROW)],
@@ -65,6 +62,7 @@ async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Open Game Conversation"""
     user = update.message.from_user
     answer = update.message.text
 
@@ -93,16 +91,6 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                    parse_mode=ParseMode.HTML)
 
 
-async def main_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.message.from_user
-    answer = update.message.text
-
-    logger.info(f"User: {user.username}, user_id: {user.id}. The user has started info conversation.")
-
-    await context.bot.send_message(chat_id=user.id, text="<b>Корисна Інформація</b>\nВ розробці...",
-                                   parse_mode=ParseMode.HTML)
-
-
 async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     answer = update.message.text
@@ -118,3 +106,15 @@ async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=user.id, text="<b>Керування</b>", reply_markup=reply_markup,
                                    parse_mode=ParseMode.HTML)
+
+
+async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Return to top level conversation"""
+
+    user = update.message.from_user
+
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user has stopped {ConversationHandler.name}.")
+
+    await start_main(update, context)
+
+    return ConversationHandler.END

@@ -2,7 +2,7 @@
     Description: Represents day timetable.
 
     Author: Ivan Maruzhenko
-    Version: 0.7
+    Version: 0.75
 """
 
 from Services.lessons import Lessons
@@ -28,13 +28,13 @@ class ScheduleBuilder:
         for lesson in self.__lessons.get_all_lessons():
             if lesson.name is not None:
                 text += f"{lesson.number}) <I>{lesson.time}</I>" \
-                        f"\n\n<B><I>{lesson.name}</I></B>" \
+                        f"\n<B><I>{lesson.name}</I></B>" \
                         f"\n<I>{lesson.professor}</I>\n\n"
 
         if text != "":
             return title + text
         else:
-            return title + "В цей день пар немає! Можна відпчивати! ;)"
+            return title + "В цей день пар немає! Можна відпочивати! ;)"
 
     def build_keyboard(self) -> InlineKeyboardMarkup:
         """Builds the keyboard with links to lessons"""
@@ -43,12 +43,18 @@ class ScheduleBuilder:
 
         return InlineKeyboardMarkup(keyboard)
 
-    def build_extended_keyboard(self) -> InlineKeyboardMarkup:
-        """Builds the extended keyboard with links to lessons"""
+    def build_extended_keyboard(self, mode: str) -> InlineKeyboardMarkup:
+        """Builds the extended keyboard with links to lessons
+        'week' - for week schedule;
+        'all' - for all schedule"""
 
         extended_keyboard = self._build_markup()
-        extended_keyboard.append([InlineKeyboardButton(text="<", callback_data="back"),
-                                  InlineKeyboardButton(text=">", callback_data="forward")])
+        if mode == "week":
+            extended_keyboard.append([InlineKeyboardButton(text="<", callback_data="previous_day"),
+                                      InlineKeyboardButton(text=">", callback_data="next_day")])
+        elif mode == "all":
+            extended_keyboard.append([InlineKeyboardButton(text="<", callback_data="back"),
+                                      InlineKeyboardButton(text=">", callback_data="forward")])
 
         return InlineKeyboardMarkup(extended_keyboard)
 
