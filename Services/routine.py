@@ -22,7 +22,7 @@ async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = "")
             await context.bot.send_message(chat_id=user,
                                            text=schedule.build_text(title=title),
                                            parse_mode=telegram.constants.ParseMode.HTML,
-                                           reply_markup=schedule.build_markup())
+                                           reply_markup=schedule.build_keyboard())
         except telegram.error.BadRequest:
             logger.warning(f"The user, with id - {user}, did not start a chat with the bot.")
             pass
