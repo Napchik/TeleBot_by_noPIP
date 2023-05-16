@@ -30,6 +30,13 @@ def today_day() -> int:
     return result
 
 
+def get_week() -> int:
+    """Function to find out number of week 1 -> week1 2 -> week2"""
+    filter = f"SELECT week FROM info_global"
+    result = reformation_data.reformat_int(SQL.execute(filter))
+    return result
+
+
 def users_by_group(group: str) -> list:
     """Function to execute all user_id by group"""
     filter = f"SELECT user_id FROM users WHERE group_name = '{group}'"
