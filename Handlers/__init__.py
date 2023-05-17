@@ -7,4 +7,4 @@
 
 from .commands import help, today, tomorrow
 from .queue import daily_schedule, schedule_for_tomorrow
-from .conversations import REGISTRATION_CONVERSATION, MAIN_CONVERSATION, SCHEDULE_UPDATE_CONVERSATION
+from .conversations import REGISTRATION_CONVERSATION, MAIN_CONVERSATION, WEEK_SCHEDULE_CONVERSATION

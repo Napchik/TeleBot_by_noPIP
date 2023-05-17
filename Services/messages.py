@@ -41,7 +41,7 @@ class Answers:
     SCHEDULE_TODAY: str = "Сьогодні"
     SCHEDULE_TOMORROW: str = "Завтра"
     SCHEDULE_WEEK: str = "Поточний тиждень"
-    SCHEDULE_ALL: str = "Весь Розклад"
+    SCHEDULE_ALL: str = "Два тижні"
 
     SET_SCHEDULE: str = "ON/OFF Розклад"
     SET_TIME: str = "Змінити час розсилки"

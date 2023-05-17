@@ -6,19 +6,19 @@ from Database.db_function import today_day
 from telegram.constants import ParseMode
 
 current_day: int = today_day()
-CHANGE_DAY = chr(1)
+CHANGE_DAY = chr(9)
 
 
-async def send_week_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def send_all_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Schedule for current_week"""
 
     user = update.effective_user
-    logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a weekly schedule.")
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a schedule for two weeks.")
 
     builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, current_day)
     await update.message.reply_text(text=builder.build_text("<b>РОЗКЛАД НА СЬОГОДНІ:</b>"),
                                     parse_mode=ParseMode.HTML,
-                                    reply_markup=builder.build_extended_keyboard())
+                                    reply_markup=builder.build_extended_keyboard(mode="all"))
 
     return CHANGE_DAY
 
@@ -57,4 +57,4 @@ async def _build_schedule_message(update: Update, context: ContextTypes.DEFAULT_
 
     await query.edit_message_text(text=builder.build_text(f"<b>РОЗКЛАД НА ДЕНЬ № {day}:</b>"),
                                   parse_mode=ParseMode.HTML,
-                                  reply_markup=builder.build_extended_keyboard())
+                                  reply_markup=builder.build_extended_keyboard(mode="all"))
