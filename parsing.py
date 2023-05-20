@@ -8,21 +8,15 @@
     Output: schedule (dict)
 
     Authors: Ivan Skorobagatko
-    Version: 0.3 (beta)
+    Version: 1.0 (release)
 """
 
 import requests
 import time
 import re
-import logging
 
+from loger_config import logger
 from bs4 import BeautifulSoup
-
-# This should be changed in future
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
 
 
 class Parser:
@@ -86,7 +80,7 @@ class Parser:
             :param url: url of site to handle (string)
             :param method: method of request ("get" or "post" only)
         """
-        logging.info("Connection was timed out. Retrying...")
+        logger.info("Connection was timed out. Retrying...")
         self.retry_counter += 1
         time.sleep(0.5)
         self._response_handler(url=url, method=method)
@@ -168,14 +162,14 @@ class Parser:
             :param group: Takes the name of group (str). This should be written in Ukraine language.
             :return: Returns dictionary with schedule if success, otherwise - empty dict.
         """
-        logging.info(f"Started parsing group '{group}'")
+        logger.info(f"Started parsing group '{group}'")
         self.parsed_data.clear()
         self._response_handler(url=self.start_url, method="get")
 
         self._payload_creator(group=group)
         self._response_handler(url=self.start_url, method="post")
         if self.response.status_code != 302:
-            logging.critical(f"Group '{group}' doesn't exists")
+            logger.critical(f"Group '{group}' doesn't exists")
             return self.parsed_data
 
         self.last_url = "http://epi.kpi.ua" + self.response.headers["Location"]
@@ -186,5 +180,5 @@ class Parser:
         self._parser(param="table#ctl00_MainContent_SecondScheduleTable tr")
         self.parsed_data["week2"] = self._trans_data()
 
-        logging.info(f"Group '{group}' has been parsed successful")
+        logger.info(f"Group '{group}' has been parsed successful")
         return self.parsed_data
