@@ -97,7 +97,7 @@ async def routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     return REG_INFO
 
 
-async def info(update: Update):
+async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
 
     user_data.role = choose_role(user_data.group)
@@ -115,7 +115,7 @@ async def info(update: Update):
                                         reply_markup=ReplyKeyboardMarkup([[KeyboardButton(answers.GOT_IT)]],
                                                                          one_time_keyboard=True, resize_keyboard=True))
 
-    # user_data.send_data()
+    user_data.send_data()
 
     logger.info(f"User: {user.username}, user_id: {user.id}. User successfully completed registration."
                 f"\nUser data: {user_data}")
