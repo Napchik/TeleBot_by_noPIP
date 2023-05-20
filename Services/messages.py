@@ -54,10 +54,13 @@ class Answers:
     SCHEDULE_WEEK: str = "Поточний тиждень"
     SCHEDULE_ALL: str = "Два тижні"
 
-    SET_SCHEDULE: str = "ON/OFF Розклад"
-    SET_TIME: str = "Змінити час розсилки"
-    SET_GROUP: str = "Змінити групу"
-    SET_BUG: str = "Повідомити про помилку"
+    SETTINGS_TIME: str = "Змінити час розсилки"
+    SETTINGS_NO: str = "Ніколи"
+    SETTINGS_MORNING: str = "Лише зранку"
+    SETTINGS_ALL: str = "Зранку та ввечері"
+    SETTINGS_GROUP: str = "Змінити групу"
+    SETTINGS_DENY: str = "Відмінити зміни"
+    SETTINGS_BUG: str = "Повідомити про помилку"
 
     CONTROLS_LINKS: str = "Змінити посилання на пару"
     CONTROLS_ROLE: str = "Передати роль модератора"
