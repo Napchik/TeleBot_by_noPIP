@@ -77,11 +77,10 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started settings conversation.")
 
-    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.SET_SCHEDULE),
-                                         KeyboardButton(text=answers.SET_TIME)],
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.SETTINGS_TIME)],
 
-                                        [KeyboardButton(text=answers.SET_GROUP),
-                                         KeyboardButton(text=answers.SET_BUG)],
+                                        [KeyboardButton(text=answers.SETTINGS_GROUP),
+                                         KeyboardButton(text=answers.SETTINGS_BUG)],
 
                                         [KeyboardButton(text=answers.BACK)]],
                                        one_time_keyboard=True,
@@ -89,6 +88,8 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=user.id, text="<b>Налаштування</b>", reply_markup=reply_markup,
                                    parse_mode=ParseMode.HTML)
+
+    return SETTINGS
 
 
 async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):

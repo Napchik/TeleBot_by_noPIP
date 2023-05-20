@@ -38,6 +38,14 @@ from Services.week_schedule_conversation import (
     previous_day_in_week
 )
 
+from Services.settings_conversation import (
+    CHANGE_TIME,
+    switch_schedule_mode, update_schedule_mode,
+    CHANGE_GROUP,
+    switch_group_mode, update_group_mode, cancel_change,
+    report_bug
+)
+
 from Services.all_schedule_conversation import CHANGE_DAY, send_all_schedule, next_day, previous_day
 
 from telegram.ext import (
@@ -56,7 +64,6 @@ import re
 answers = RoutineChoice.Answers
 pattern_cyrillic = re.compile(r"[А-Яа-яёЁіІ']{2}-[0-9]{2}")
 pattern_latin = re.compile(r"[A-Za-z]{2}-[0-9]{2}")
-
 
 ALL_SCHEDULE_CONVERSATION = ConversationHandler(
 
@@ -100,13 +107,57 @@ WEEK_SCHEDULE_CONVERSATION = ConversationHandler(
         MessageHandler(filters.TEXT, misunderstand)
     ])
 
+SWITCH_TIME_CONVERSATION = ConversationHandler(
+
+    entry_points=[MessageHandler(filters.Regex(answers.SETTINGS_TIME), switch_schedule_mode)],
+
+    allow_reentry=True,
+
+    conversation_timeout=60,
+
+    states={
+
+        CHANGE_TIME: [
+            MessageHandler(filters.Regex(f"({answers.SETTINGS_NO})|"
+                                         f"({answers.SETTINGS_MORNING})|"
+                                         f"({answers.SETTINGS_ALL})"),
+                           update_schedule_mode)
+        ]},
+
+    fallbacks=[
+
+        MessageHandler(filters.Regex(answers.BACK), back_to_main),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
+
+SWITCH_GROUP_CONVERSATION = ConversationHandler(
+
+    entry_points=[MessageHandler(filters.Regex(answers.SETTINGS_GROUP), switch_group_mode)],
+
+    allow_reentry=True,
+
+    conversation_timeout=60,
+
+    states={
+
+        CHANGE_GROUP: [
+            MessageHandler(filters.Regex(pattern_cyrillic), update_group_mode)
+        ]},
+
+    fallbacks=[
+
+        MessageHandler(filters.Regex(answers.SETTINGS_DENY), cancel_change),
+        MessageHandler(filters.Regex(answers.BACK), back_to_main),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
+
 MAIN_CONVERSATION = ConversationHandler(
 
     entry_points=[
 
         CommandHandler("menu", start_main),
         MessageHandler(filters.Regex(answers.BACK), start_main),
-        MessageHandler(filters.Regex(answers.GOT_IT), start_main)
+        MessageHandler(filters.Regex(answers.GOT_IT), start_main),
     ],
 
     allow_reentry=True,
@@ -129,11 +180,18 @@ MAIN_CONVERSATION = ConversationHandler(
             WEEK_SCHEDULE_CONVERSATION,
             ALL_SCHEDULE_CONVERSATION
 
-        ]},
+        ],
+
+        SETTINGS: [
+
+            SWITCH_TIME_CONVERSATION,
+            SWITCH_GROUP_CONVERSATION,
+            MessageHandler(filters.Regex(answers.SETTINGS_BUG), report_bug),
+
+        ]
+    },
 
     # GAME: [],
-    #
-    # SETTINGS: [],
     #
     # CONTROLS: []},
 
@@ -143,7 +201,6 @@ MAIN_CONVERSATION = ConversationHandler(
         MessageHandler(filters.TEXT, misunderstand)
 
     ])
-
 
 REGISTRATION_CONVERSATION = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
