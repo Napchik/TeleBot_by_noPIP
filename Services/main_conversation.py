@@ -19,7 +19,6 @@ answers = RoutineChoice.Answers
 async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Start of main conversation"""
     user = update.message.from_user
-    # answer = update.message.text
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started main conversation.")
 
@@ -41,7 +40,6 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Returned the keyboard with schedule options"""
     user = update.message.from_user
-    answer = update.message.text
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has asked to go to schedule conversation.")
 
@@ -64,7 +62,6 @@ async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Open Game Conversation"""
     user = update.message.from_user
-    answer = update.message.text
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started game conversation.")
 
@@ -72,8 +69,8 @@ async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Open Settings Conversation"""
     user = update.message.from_user
-    answer = update.message.text
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started settings conversation.")
 
@@ -93,8 +90,8 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Open Controls Conversation"""
     user = update.message.from_user
-    answer = update.message.text
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started controls conversation.")
 
@@ -110,7 +107,7 @@ async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Return to top level conversation"""
+    """Return to main conversation"""
 
     user = update.message.from_user
 
