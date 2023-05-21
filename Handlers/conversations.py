@@ -2,7 +2,7 @@
     Description: Contains conversation handlers.
 
     Author: Ivan Maruzhenko
-    Version: 0.3
+    Version: 0.4
 """
 
 from Services.registration_conversation import (
@@ -62,8 +62,7 @@ import Handlers
 import re
 
 answers = RoutineChoice.Answers
-pattern_cyrillic = re.compile(r"[А-Яа-яёЁіІ']{2}-[0-9]{2}")
-pattern_latin = re.compile(r"[A-Za-z]{2}-[0-9]{2}")
+pattern_ua = re.compile(r"^[А-ЩЬЮЯЇІЄҐ]{2}-\d{2}$", re.IGNORECASE)
 
 ALL_SCHEDULE_CONVERSATION = ConversationHandler(
 
@@ -141,7 +140,7 @@ SWITCH_GROUP_CONVERSATION = ConversationHandler(
     states={
 
         CHANGE_GROUP: [
-            MessageHandler(filters.Regex(pattern_cyrillic), update_group_mode)
+            MessageHandler(filters.Regex(pattern_ua), update_group_mode)
         ]},
 
     fallbacks=[
@@ -208,8 +207,7 @@ REGISTRATION_CONVERSATION = ConversationHandler(
     states={
         GROUP:
             [
-                MessageHandler(filters.Regex(pattern_latin), group),
-                MessageHandler(filters.Regex(pattern_cyrillic), group)
+                MessageHandler(filters.Regex(pattern_ua), group)
             ],
 
         ROUTINE:
