@@ -2,7 +2,7 @@
     Description: Contains logic of main conversation.
 
     Author: Ivan Maruzhenko
-    Version: 0.2
+    Version: 0.3
 """
 
 from telegram.constants import ParseMode
@@ -10,10 +10,25 @@ from loger_config import logger
 from Services.messages import RoutineChoice
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
+from Database.db_function_user import check_user_role
 
 MENU, SCHEDULE, GAME, SETTINGS, CONTROLS = map(chr, range(3, 8))
 
 answers = RoutineChoice.Answers
+
+
+def moderator_mode(func):
+    async def check_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user = update.message.from_user
+        if check_user_role(user.id) == "moderator":
+            await func(update, context)
+        else:
+
+            await context.bot.send_message(chat_id=user.id,
+                                           text="<b>Доступ заблоковано!</b>\nВи не є модератором групи!",
+                                           parse_mode=ParseMode.HTML)
+
+    return check_user
 
 
 async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -22,14 +37,21 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started main conversation.")
 
-    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE),
-                                         KeyboardButton(text=answers.MAIN_SETTINGS)],
+    if check_user_role(user.id) == "user":
+        reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE)],
+                                            [KeyboardButton(text=answers.MAIN_SETTINGS)],
 
-                                        [KeyboardButton(text=answers.MAIN_CONTROLS)],
+                                            [KeyboardButton(text=answers.MAIN_GAME)]],
+                                           one_time_keyboard=True,
+                                           resize_keyboard=True)
+    else:
+        reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE),
+                                             KeyboardButton(text=answers.MAIN_SETTINGS)],
 
-                                        [KeyboardButton(text=answers.MAIN_GAME)]],
-                                       one_time_keyboard=True,
-                                       resize_keyboard=True)
+                                            [KeyboardButton(text=answers.MAIN_CONTROLS),
+                                             KeyboardButton(text=answers.MAIN_GAME)]],
+                                           one_time_keyboard=True,
+                                           resize_keyboard=True)
 
     await context.bot.send_message(chat_id=user.id, text="<b>Головне меню:</b>", reply_markup=reply_markup,
                                    parse_mode=ParseMode.HTML)
@@ -89,6 +111,7 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return SETTINGS
 
 
+@moderator_mode
 async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Open Controls Conversation"""
     user = update.message.from_user
@@ -104,6 +127,7 @@ async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=user.id, text="<b>Керування</b>", reply_markup=reply_markup,
                                    parse_mode=ParseMode.HTML)
+    return CONTROLS
 
 
 async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
