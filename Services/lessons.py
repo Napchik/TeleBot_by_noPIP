@@ -2,7 +2,7 @@
     Description: Download the schedule from the DB.
 
     Author: Ivan Maruzhenko
-    Version: 0.6
+    Version: 0.7
 """
 
 from Database.db_function import schedule_day_by_group, link_by_subject, professor_by_subject
@@ -49,7 +49,7 @@ class Lessons:
             else:
                 list_of_items.append(
                     Lesson(number=c + 1, time=timetable[c], name=i, professor=professor_by_subject(self.group, i),
-                           url=link_by_subject(self.group, i).split(", ")))
+                           url=link_by_subject(self.group, i).split(",")))
         return list_of_items
 
     def get_lesson(self, number: int) -> Lesson:
