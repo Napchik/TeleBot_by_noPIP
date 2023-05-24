@@ -5,6 +5,6 @@
     Version: 0.51
 """
 
-from .commands import help, today, tomorrow
+from .commands import help
 from .queue import daily_schedule, schedule_for_tomorrow
-from .conversations import REGISTRATION_CONVERSATION, MAIN_CONVERSATION, WEEK_SCHEDULE_CONVERSATION
+from .conversations import REGISTRATION_CONVERSATION, MAIN_CONVERSATION

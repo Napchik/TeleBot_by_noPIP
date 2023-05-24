@@ -2,7 +2,7 @@
     Description: Description of the Bot work.
 
     Author: Ivan Maruzhenko
-    Version: 0.71
+    Version: 0.75
 """
 
 import datetime
@@ -18,17 +18,16 @@ load_dotenv(find_dotenv())
 API_TOKEN = os.getenv("TOKEN")
 
 COMMAND_HANDLERS = {
-    "today": Handlers.today,
-    "tomorrow": Handlers.tomorrow,
     "help": Handlers.help
 }
 
 CONVERSATION_HANDLERS = (
-    Handlers.REGISTRATION_CONVERSATION, Handlers.MAIN_CONVERSATION, Handlers.WEEK_SCHEDULE_CONVERSATION)
+    Handlers.REGISTRATION_CONVERSATION, Handlers.MAIN_CONVERSATION)
 
 
 def app():
     """The main function of the program"""
+
     settings = telegram.ext.Defaults(tzinfo=datetime.timezone(offset=datetime.timedelta(hours=2)))
     application = ApplicationBuilder().token(API_TOKEN).defaults(settings).build()
 

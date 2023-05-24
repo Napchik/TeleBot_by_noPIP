@@ -2,7 +2,7 @@
     Description: Contains conversation handlers.
 
     Author: Ivan Maruzhenko
-    Version: 0.4
+    Version: 0.5
 """
 
 from Services.registration_conversation import (
@@ -32,21 +32,28 @@ from Services.main_conversation import (
     back_to_main
 )
 
-from Services.week_schedule_conversation import (
-    CHANGE_DAY_IN_WEEK,
-    send_week_schedule, next_day_in_week,
-    previous_day_in_week
+from Services.weekly_schedule_conversation import (
+    WEEK_SCHEDULE,
+    ALL_SCHEDULE,
+    send_week_schedule,
+    next_day_in_week,
+    previous_day_in_week,
+    send_all_schedule,
+    next_day,
+    previous_day,
+    send_week_schedule_links,
+    send_all_schedule_links
 )
 
 from Services.settings_conversation import (
     CHANGE_TIME,
-    switch_schedule_mode, update_schedule_mode,
     CHANGE_GROUP,
-    switch_group_mode, update_group_mode, cancel_change,
+    switch_schedule_mode,
+    update_schedule_mode,
+    switch_group_mode,
+    update_group_mode, cancel_change,
     report_bug
 )
-
-from Services.all_schedule_conversation import CHANGE_DAY, send_all_schedule, next_day, previous_day
 
 from telegram.ext import (
     ConversationHandler,
@@ -56,38 +63,31 @@ from telegram.ext import (
     filters
 )
 
+from Services.daily_schedule_conversation import (
+    today,
+    today_links,
+    tomorrow,
+    tomorrow_links,
+    TODAY_SCHEDULE,
+    TOMORROW_SCHEDULE
+)
 from Services.messages import RoutineChoice
 
-import Handlers
 import re
 
 answers = RoutineChoice.Answers
 pattern_ua = re.compile(r"^[А-ЩЬЮЯЇІЄҐ]{2}-\d{2}$", re.IGNORECASE)
 
-ALL_SCHEDULE_CONVERSATION = ConversationHandler(
+SCHEDULE_CONVERSATION = ConversationHandler(
 
-    entry_points=[MessageHandler(filters.Regex(answers.SCHEDULE_ALL), send_all_schedule)],
+    entry_points=
 
-    allow_reentry=True,
-
-    conversation_timeout=60,
-
-    states={
-
-        CHANGE_DAY: [
-            CallbackQueryHandler(previous_day, pattern="back"),
-            CallbackQueryHandler(next_day, pattern="forward")]},
-
-    fallbacks=[
-
-        MessageHandler(filters.Regex(answers.BACK), back_to_main),
-        MessageHandler(filters.TEXT, misunderstand)
-
-    ])
-
-WEEK_SCHEDULE_CONVERSATION = ConversationHandler(
-
-    entry_points=[MessageHandler(filters.Regex(answers.SCHEDULE_WEEK), send_week_schedule)],
+    [
+        MessageHandler(filters.Regex(answers.SCHEDULE_TODAY), today),
+        MessageHandler(filters.Regex(answers.SCHEDULE_TOMORROW), tomorrow),
+        MessageHandler(filters.Regex(answers.SCHEDULE_ALL), send_all_schedule),
+        MessageHandler(filters.Regex(answers.SCHEDULE_WEEK), send_week_schedule)
+    ],
 
     allow_reentry=True,
 
@@ -95,15 +95,41 @@ WEEK_SCHEDULE_CONVERSATION = ConversationHandler(
 
     states={
 
-        CHANGE_DAY_IN_WEEK: [
-            CallbackQueryHandler(previous_day_in_week, pattern="previous_day"),
-            CallbackQueryHandler(next_day_in_week, pattern="next_day")]},
+        TODAY_SCHEDULE:
+
+            [
+                CallbackQueryHandler(today_links, pattern=re.compile("^today_links\d+$")),
+            ],
+
+        TOMORROW_SCHEDULE:
+
+            [
+                CallbackQueryHandler(tomorrow_links, pattern=re.compile("^tomorrow_links\d+$"))
+            ],
+
+        WEEK_SCHEDULE:
+            [
+                CallbackQueryHandler(previous_day_in_week, pattern="previous_day"),
+                CallbackQueryHandler(next_day_in_week, pattern="next_day"),
+
+                CallbackQueryHandler(send_week_schedule_links, pattern=re.compile("^week_schedule_links\d+$"))
+            ],
+
+        ALL_SCHEDULE:
+
+            [
+                CallbackQueryHandler(previous_day, pattern="back"),
+                CallbackQueryHandler(next_day, pattern="forward"),
+
+                CallbackQueryHandler(send_all_schedule_links, pattern=re.compile("^all_schedule_links\d+$"))
+            ],
+    },
 
     fallbacks=[
 
-        ALL_SCHEDULE_CONVERSATION,
         MessageHandler(filters.Regex(answers.BACK), back_to_main),
         MessageHandler(filters.TEXT, misunderstand)
+
     ])
 
 SWITCH_TIME_CONVERSATION = ConversationHandler(
@@ -172,14 +198,7 @@ MAIN_CONVERSATION = ConversationHandler(
 
         ],
 
-        SCHEDULE: [
-
-            MessageHandler(filters.Regex(answers.SCHEDULE_TODAY), Handlers.today),
-            MessageHandler(filters.Regex(answers.SCHEDULE_TOMORROW), Handlers.tomorrow),
-            WEEK_SCHEDULE_CONVERSATION,
-            ALL_SCHEDULE_CONVERSATION
-
-        ],
+        SCHEDULE: [SCHEDULE_CONVERSATION],
 
         SETTINGS: [
 
