@@ -5,11 +5,11 @@
     Version: 0.2
 """
 
-from telegram import Update, InlineKeyboardMarkup
+from telegram import Update
 from telegram.ext import ContextTypes
 from loger_config import logger
-from Services.schedule_builder import ScheduleBuilder, build_extended_markup
-from Services.one_day_schedule_conversation import send_links
+from Services.schedule_builder import ScheduleBuilder
+from Services.daily_schedule_conversation import send_links, clear_markup
 from Database.db_function import today_day, get_week
 from telegram.constants import ParseMode
 
@@ -18,15 +18,7 @@ current_day: int = today_day()
 current_week: int = get_week()
 week_borders = {1: (1, 7), 2: (8, 14)}
 WEEK_SCHEDULE, ALL_SCHEDULE = map(chr, range(8, 10))
-
-
-def clear_extended_keyboard(func, step_back: str, step_forward: str):
-    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE, *args, **kwargs):
-        query = update.callback_query
-        await func(update, context, *args, **kwargs)
-        await query.edit_message_reply_markup(InlineKeyboardMarkup([build_extended_markup(step_back, step_forward)]))
-
-    return wrapper
+link_message_id: bool = False
 
 
 async def send_week_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -148,8 +140,8 @@ async def _all_schedule_message(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def send_week_schedule_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await clear_extended_keyboard(send_links, "previous_day", "next_day")(update, context, current_week_day)
+    await clear_markup(send_links)(update, context, current_week_day)
 
 
 async def send_all_schedule_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await clear_extended_keyboard(send_links, "back", "forward")(update, context, current_day)
+    await clear_markup(send_links)(update, context, current_day)

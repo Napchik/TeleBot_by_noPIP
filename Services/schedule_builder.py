@@ -10,13 +10,6 @@ from Database.db_function import group_by_user
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def build_extended_markup(step_back: str, step_forward: str):
-    markup: list[InlineKeyboardButton] = [InlineKeyboardButton(text="<", callback_data=step_back),
-                                          InlineKeyboardButton(text=">", callback_data=step_forward)]
-
-    return markup
-
-
 class ScheduleBuilder:
     """Class day represents the daily schedule"""
 
@@ -76,7 +69,8 @@ class ScheduleBuilder:
 
         extended_keyboard = self._build_special_markup(callback)
 
-        extended_keyboard.append(build_extended_markup(step_back, step_forward))
+        extended_keyboard.append([InlineKeyboardButton(text="<", callback_data=step_back),
+                                  InlineKeyboardButton(text=">", callback_data=step_forward)])
 
         return InlineKeyboardMarkup(extended_keyboard)
 
@@ -107,20 +101,23 @@ class ScheduleBuilder:
         for lesson in self.__lessons.get_all_lessons():
             if lesson.name is not None and len(lesson.url) > 1:
                 markup.append(
-                    [InlineKeyboardButton(f"Посилання на пару № {lesson.number}", callback_data=callback)])
+                    [InlineKeyboardButton(f"Посилання на пару № {lesson.number}",
+                                          callback_data=callback + f"{lesson.number}")])
 
         return markup
 
-    def build_link_list(self):
+    def build_link_list(self, lesson_number: int):
         """Builds message with links for lessons with more than one link"""
 
-        text: str = "<b>Всі посилання на пару:\n\n</b>"
-        for lesson in self.__lessons.get_all_lessons():
-            if lesson.name is not None and len(lesson.url) > 1:
-                for count, link in enumerate(lesson.url):
-                    if count != len(lesson.url):
-                        text += f"<b>{count + 1}.</b> {link}\n\n"
-                    else:
-                        text += f"<b>{count + 1}.</b> {link}"
+        text: str = ""
+        lesson = self.__lessons.get_lesson(lesson_number)
+        if lesson.name is not None and len(lesson.url) > 1:
+            text += f"<b>{lesson.name}</b>\n\n"
+            text += "<b>Всі посилання на пару:\n\n</b>"
+            for count, link in enumerate(lesson.url):
+                if count + 1 != len(lesson.url):
+                    text += f"<b>{count + 1}.</b> {link}\n\n"
+                else:
+                    text += f"<b>{count + 1}.</b> {link}"
 
         return text

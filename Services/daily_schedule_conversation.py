@@ -11,15 +11,20 @@ from telegram.ext import ContextTypes, ConversationHandler
 from Services.schedule_builder import ScheduleBuilder
 from Database.db_function import today_day
 from loger_config import logger
+import re
 
-GET_TODAY_LINKS, GET_TOMORROW_LINKS = map(chr, range(10, 12))
+TODAY_SCHEDULE, TOMORROW_SCHEDULE = map(chr, range(10, 12))
 
 
 def clear_markup(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE, day: int):
         query = update.callback_query
+        current_markup = query.message.reply_markup
+        new_markup = []
         await func(update, context, day)
-        await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup([]))
+        for row in current_markup.inline_keyboard:
+            new_markup.append([button for button in row if button.callback_data != query.data])
+        await query.edit_message_reply_markup(InlineKeyboardMarkup(new_markup))
 
     return wrapper
 
@@ -32,7 +37,7 @@ async def today(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await _schedule_for_the_day(update, context, 3, "СЬОГОДНІ", "today_links")
 
-    return GET_TODAY_LINKS
+    return TODAY_SCHEDULE
 
 
 async def today_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -52,7 +57,7 @@ async def tomorrow(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await _schedule_for_the_day(update, context, 9, "ЗАВТРА", "tomorrow_links")
 
-    return GET_TOMORROW_LINKS
+    return TOMORROW_SCHEDULE
 
 
 async def tomorrow_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,10 +96,10 @@ async def _schedule_for_the_day(
 
 async def send_links(update: Update, context: ContextTypes.DEFAULT_TYPE, day: int):
     """Sends message with links for lessons with more than one link"""
-
+    lesson_number = int(re.search(r"\d+", update.callback_query.data).group())
     builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, day)
     await context.bot.send_message(chat_id=update.effective_chat.id,
-                                   text=builder.build_link_list(),
+                                   text=builder.build_link_list(lesson_number),
                                    parse_mode=ParseMode.HTML,
                                    disable_web_page_preview=True)
 
