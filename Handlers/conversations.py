@@ -2,7 +2,7 @@
     Description: Contains conversation handlers.
 
     Author: Ivan Maruzhenko
-    Version: 0.5
+    Version: 0.6
 """
 
 from Services.registration_conversation import (
@@ -48,11 +48,12 @@ from Services.weekly_schedule_conversation import (
 from Services.settings_conversation import (
     CHANGE_TIME,
     CHANGE_GROUP,
+    SEND_BUG,
     switch_schedule_mode,
     update_schedule_mode,
     switch_group_mode,
     update_group_mode, cancel_change,
-    report_bug
+    report_bug, send_bug_message
 )
 
 from telegram.ext import (
@@ -71,6 +72,13 @@ from Services.daily_schedule_conversation import (
     TODAY_SCHEDULE,
     TOMORROW_SCHEDULE
 )
+
+from game import (
+    MAIN_GAME, ADD_PLAYER,
+    game_start, dice_game, add_player,
+    stop, top_players
+)
+
 from Services.messages import RoutineChoice
 
 import re
@@ -80,13 +88,13 @@ pattern_ua = re.compile(r"^[А-ЩЬЮЯЇІЄҐ]{2}-\d{2}$", re.IGNORECASE)
 
 SCHEDULE_CONVERSATION = ConversationHandler(
 
-    entry_points=
+    entry_points=[
 
-    [
         MessageHandler(filters.Regex(answers.SCHEDULE_TODAY), today),
         MessageHandler(filters.Regex(answers.SCHEDULE_TOMORROW), tomorrow),
         MessageHandler(filters.Regex(answers.SCHEDULE_ALL), send_all_schedule),
         MessageHandler(filters.Regex(answers.SCHEDULE_WEEK), send_week_schedule)
+
     ],
 
     allow_reentry=True,
@@ -176,6 +184,65 @@ SWITCH_GROUP_CONVERSATION = ConversationHandler(
         MessageHandler(filters.TEXT, misunderstand)
     ])
 
+REPORT_BUG_CONVERSATION = ConversationHandler(
+
+    entry_points=[MessageHandler(filters.Regex(answers.SETTINGS_BUG), report_bug)],
+
+    allow_reentry=True,
+
+    conversation_timeout=60,
+
+    states={
+
+        SEND_BUG: [
+
+            MessageHandler(filters.TEXT, send_bug_message)
+
+        ],
+
+    },
+
+    fallbacks=[
+
+        MessageHandler(filters.Regex(answers.BACK), back_to_main),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
+
+GAME_CONVERSATION = ConversationHandler(
+
+    entry_points=[
+
+        CommandHandler('start_game', game_start),
+        CommandHandler('top_players', top_players),
+
+    ],
+
+    allow_reentry=True,
+
+    conversation_timeout=300,
+
+    states={
+
+        ADD_PLAYER: [
+
+            MessageHandler(filters.TEXT, add_player)
+
+        ],
+
+        MAIN_GAME: [
+
+            MessageHandler(filters.Regex(r"[так | ні]"), dice_game)
+
+        ]
+
+    },
+
+    fallbacks=[
+
+        CommandHandler('stop_game', stop),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
+
 MAIN_CONVERSATION = ConversationHandler(
 
     entry_points=[
@@ -198,19 +265,27 @@ MAIN_CONVERSATION = ConversationHandler(
 
         ],
 
-        SCHEDULE: [SCHEDULE_CONVERSATION],
+        GAME: [
+
+            GAME_CONVERSATION
+
+        ],
+
+        SCHEDULE: [
+
+            SCHEDULE_CONVERSATION
+
+        ],
 
         SETTINGS: [
 
             SWITCH_TIME_CONVERSATION,
             SWITCH_GROUP_CONVERSATION,
-            MessageHandler(filters.Regex(answers.SETTINGS_BUG), report_bug),
+            REPORT_BUG_CONVERSATION
 
         ]
     },
 
-    # GAME: [],
-    #
     # CONTROLS: []},
 
     fallbacks=[
