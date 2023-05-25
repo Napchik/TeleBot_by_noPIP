@@ -54,6 +54,9 @@ class Answers:
     SCHEDULE_WEEK: str = "Поточний тиждень"
     SCHEDULE_ALL: str = "Два тижні"
 
+    GAME_START: str = "Так"
+    GAME_STOP: str = "Ні"
+
     SETTINGS_TIME: str = "Змінити час розсилки"
     SETTINGS_NO: str = "Ніколи"
     SETTINGS_MORNING: str = "Лише зранку"

@@ -2,7 +2,7 @@
     Description: Contains conversation handlers.
 
     Author: Ivan Maruzhenko
-    Version: 0.6
+    Version: 0.6.1
 """
 
 from Services.registration_conversation import (
@@ -225,13 +225,17 @@ GAME_CONVERSATION = ConversationHandler(
 
         ADD_PLAYER: [
 
-            MessageHandler(filters.TEXT, add_player)
+            MessageHandler(filters.TEXT, add_player),
+            CallbackQueryHandler(dice_game, pattern="dice_game"),
+            CallbackQueryHandler(stop, pattern="stop"),
 
         ],
 
         MAIN_GAME: [
 
-            MessageHandler(filters.Regex(r"[так | ні]"), dice_game)
+            MessageHandler(filters.Regex(r"[так | ні]"), dice_game),
+            CallbackQueryHandler(dice_game, pattern="dice_game"),
+            CallbackQueryHandler(stop, pattern="stop"),
 
         ]
 

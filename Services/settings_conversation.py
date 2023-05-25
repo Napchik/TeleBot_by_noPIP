@@ -2,7 +2,7 @@
     Description: Settings conversation handlers.
 
     Author: Ivan Skorobagatko
-    Version: 0.1
+    Version: 0.1.1
 """
 
 import os
@@ -93,7 +93,7 @@ async def update_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     new_group = update.message.text
 
-    change_group(user.id, new_group)
+    change_group(user.id, new_group.upper())
 
     await context.bot.send_message(chat_id=user.id, text="<b>Групу змінено успішно</b>", parse_mode=ParseMode.HTML)
 
@@ -127,9 +127,11 @@ async def send_bug_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send Bug"""
 
     user = update.effective_user
-    logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
     text = update.message.text
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
+
+    # add_log(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
     REPORT_CHAT_ID = os.getenv("REPORTCHATID")
 
