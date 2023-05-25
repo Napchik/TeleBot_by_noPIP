@@ -1,3 +1,12 @@
+"""
+    Description: Settings conversation handlers.
+
+    Author: Ivan Skorobagatko
+    Version: 0.1
+"""
+
+import os
+
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
 from loger_config import logger
@@ -8,6 +17,7 @@ from Services.messages import RoutineChoice
 answers = RoutineChoice.Answers
 CHANGE_TIME = chr(10)
 CHANGE_GROUP = chr(11)
+SEND_BUG = chr(12)
 
 
 async def switch_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -107,5 +117,23 @@ async def report_bug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
-    await context.bot.send_message(chat_id=user.id, text="<b>Функція у розробці, написати можна "
-                                                         "@Napchikk</b>", parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user.id, text="Будь-ласка, вкажіть вашу проблему.",
+                                   parse_mode=ParseMode.HTML)
+
+    return SEND_BUG
+
+
+async def send_bug_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Send Bug"""
+
+    user = update.effective_user
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
+
+    text = update.message.text
+
+    REPORT_CHAT_ID = os.getenv("REPORTCHATID")
+
+    await context.bot.send_message(chat_id=int(REPORT_CHAT_ID), text=text)
+    await context.bot.send_message(chat_id=user.id, text="Ваше повідомлення надіслано адміністрації.")
+
+    return ConversationHandler.END

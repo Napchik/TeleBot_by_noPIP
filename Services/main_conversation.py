@@ -2,7 +2,7 @@
     Description: Contains logic of main conversation.
 
     Author: Ivan Maruzhenko
-    Version: 0.3
+    Version: 0.4
 """
 
 from telegram.constants import ParseMode
@@ -87,7 +87,15 @@ async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started game conversation.")
 
-    await context.bot.send_message(chat_id=user.id, text="<b>Гра</b>\nВ розробці...", parse_mode=ParseMode.HTML)
+    text = """
+    <b>Гра в підкидання кубика.</b>
+    \n\nЩоб розпочати гру, напишіть <b>/start_game</b>
+    \nЩоб побачити топ 10 гравців, напишіть <b>/top_players</b>
+    """.lstrip()
+
+    await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML)
+
+    return GAME
 
 
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
