@@ -2,14 +2,15 @@
     Description: This file makes upload parsing data to Database
 
     Author: Mikhail Shikalovskyi
-    Version: 1.1
+    Version: 1.3
 """
 import parsing
-from Database import db_function, SQL
-from datetime import datetime
+from Database import db_function
+from Database.db_function import add_log
 
 
 def schedule_info_uploader():
+    """Function which triggers functions to collect and upload schedule data to database"""
     try:
         parser = parsing.Parser()
         list_group = db_function.all_groups()
@@ -18,9 +19,6 @@ def schedule_info_uploader():
             for week in data:
                 db_function.inserter_schedule(week, groups, data)
                 db_function.inserter_professor(week, groups, data)
-        filter = f"INSERT INTO log (parsing_time, status) VALUES ('{datetime.now()}', 'OK')"
-        print(f"Parsing done \033[32mSuccessfully \033[36m{datetime.now()}")
+        add_log("Parsing done Successfully")
     except:
-        filter = f"INSERT INTO log (parsing_time, status) VALUES ('{datetime.now()}', 'FAIL')"
-        print(f"Parsing \033[31mFAILED")
-    SQL.table_operate(filter)
+        add_log("Parsing FAILED")

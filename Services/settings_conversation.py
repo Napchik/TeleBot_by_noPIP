@@ -10,7 +10,8 @@ import os
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
 from loger_config import logger
-from Database.db_function_user import update_schedule_switch, change_group
+from Database.db_function import add_log
+from Database.db_function_user import update_schedule_switch, change_group, add_new_group, check_group
 from telegram.constants import ParseMode
 from Services.messages import RoutineChoice
 
@@ -79,7 +80,7 @@ async def update_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYP
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
 
-    await context.bot.send_message(chat_id=user.id, text="<b>Час змінено успішно</b>",
+    await context.bot.send_message(chat_id=user.id, text="<b>Час змінено успішно ✅</b>",
                                    reply_markup=reply_markup, parse_mode=ParseMode.HTML)
 
     return ConversationHandler.END
@@ -90,12 +91,15 @@ async def update_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user updates a group.")
+    add_log(f"User: {user.username}, user_id: {user.id}. The user changes his group.")
 
-    new_group = update.message.text
+    new_group = update.message.text.upper()
+    if not check_group(new_group):
+        add_new_group(new_group)
 
-    change_group(user.id, new_group.upper())
+    change_group(user.id, new_group)
 
-    await context.bot.send_message(chat_id=user.id, text="<b>Групу змінено успішно</b>", parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user.id, text="<b>Групу змінено успішно ✅</b>", parse_mode=ParseMode.HTML)
 
     return ConversationHandler.END
 
@@ -106,7 +110,7 @@ async def cancel_change(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user canceled a group change.")
 
-    await update.message.reply_text(text="Окей! Дані не будуть збережні.", parse_mode=ParseMode.HTML)
+    await update.message.reply_text(text="Окей! Дані не будуть збережні ❌", parse_mode=ParseMode.HTML)
 
     return ConversationHandler.END
 
@@ -117,7 +121,7 @@ async def report_bug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
-    await context.bot.send_message(chat_id=user.id, text="Будь-ласка, вкажіть вашу проблему.",
+    await context.bot.send_message(chat_id=user.id, text="Будь-ласка, вкажіть вашу проблему 📝",
                                    parse_mode=ParseMode.HTML)
 
     return SEND_BUG
@@ -131,11 +135,9 @@ async def send_bug_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
-    # add_log(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
+    add_log(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
-    REPORT_CHAT_ID = os.getenv("REPORTCHATID")
-
-    await context.bot.send_message(chat_id=int(REPORT_CHAT_ID), text=text)
+    await context.bot.send_message(chat_id=int(os.getenv("REPORTCHATID")), text=text)
     await context.bot.send_message(chat_id=user.id, text="Ваше повідомлення надіслано адміністрації.")
 
     return ConversationHandler.END

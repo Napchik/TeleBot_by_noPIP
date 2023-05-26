@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes
 from loger_config import logger
 from Services.schedule_builder import ScheduleBuilder
 from Services.daily_schedule_conversation import send_links, clear_markup
-from Database.db_function import today_day, get_week
+from Database.db_function import today_day, get_week, day_name
 from telegram.constants import ParseMode
 
 current_week_day: int = today_day()
@@ -124,7 +124,7 @@ async def _build_schedule_message(update: Update,
     query = update.callback_query
     builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, day)
 
-    await query.edit_message_text(text=builder.build_text(f"<b>РОЗКЛАД НА ДЕНЬ № {day}:</b>"),
+    await query.edit_message_text(text=builder.build_text(f"<b>РОЗКЛАД НА {day_name(day)}:</b>"),
                                   parse_mode=ParseMode.HTML,
                                   reply_markup=builder.build_extended_keyboard(step_back=step_back,
                                                                                step_forward=step_forward,

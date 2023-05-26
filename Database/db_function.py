@@ -4,20 +4,31 @@
 
           Database consists of some tables:
               log             -- id, parsing_time, status
-              info_global     -- week
+              info_global     -- week, time_lesson1, time_lesson2, time_lesson3, time_lesson4, time_lesson5,
+                                    time_lesson6, day2, day3, day4, day5, day6, day1,
+                                    day2, day3, day4, day5, day6, day7 ,day8, day9, day10, day11, day12, day13, day14
               info_professor  -- group_name, subject, name, type, link
               info_users      -- user_id, user_name, user_surname, nick_name
               list_groups     -- group_name
               schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
-              users           -- user_id, group_name, schedule_switch, status
+              users           -- user_id, group_name, schedule_switch, status, is_blocked
               game            -- user_id, user_name_game, total_score, total_games
 
+
     Author: Mikhail Shikalovskyi
-    Version: 1.4
+    Version: 1.5
 """
 import Database.reformattion_data as reformation_data
 import Database.SQL as SQL
 from datetime import datetime
+from loger_config import logger
+
+
+def add_log(log: str):
+    """Function to add logs into database"""
+    filter = f"INSERT INTO log (parsing_time, status) VALUES ('{datetime.now()}', '{log}')"
+    SQL.table_operate(filter)
+    logger.info("Log has been inserted into database")
 
 
 def today_day() -> int:
@@ -68,19 +79,29 @@ def schedule_day_by_group(group: str, day: int) -> str:
 
 
 def professor_by_subject(group: str, subject: str) -> str:
+    """Function to execute name of professor by subject name"""
     filter = f"SELECT name FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def link_by_subject(group: str, subject: str):
+    """Function to execute link for subject by subject name"""
     filter = f"SELECT link FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def time_by_number(number: int):
+    """Function to execute time of lesson given"""
     filter = f"SELECT time_lesson{number} FROM info_global"
+    result = reformation_data.reformat_str(SQL.execute(filter))
+    return result
+
+
+def day_name(day: int):
+    """Function to execute name of day by day number"""
+    filter = f"SELECT day{day} FROM info_global"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
@@ -104,6 +125,7 @@ def inserter_schedule(week: str, group: str, data: list):
         action2 = f"UPDATE schedule SET day{counter} = '{result}' WHERE group_name = '{group}'"
         SQL.exist_test_insert(filter, action1, action2)
         counter += 1
+    logger.info("Schedule has been inserted into database")
 
 
 def inserter_professor(week: str, group: str, data: list):
@@ -117,3 +139,4 @@ def inserter_professor(week: str, group: str, data: list):
                 filter = f"SELECT * FROM info_professor WHERE group_name = '{group}' AND subject = '{subject}'"
                 action1 = f"INSERT INTO info_professor (group_name, subject, name, type) VALUES ('{group}', '{subject}', '{professor}', '{position}') "
                 SQL.exist_test_insert(filter, action1, "")
+    logger.info("Professors have been inserted into database")

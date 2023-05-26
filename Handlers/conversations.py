@@ -74,9 +74,9 @@ from Services.daily_schedule_conversation import (
 )
 
 from game import (
-    MAIN_GAME, ADD_PLAYER,
+    DICE, ADD_PLAYER, CHANGE_NAME,
     game_start, dice_game, add_player,
-    stop, top_players
+    stop, top_players, change_name, update_name
 )
 
 from Services.messages import RoutineChoice
@@ -210,39 +210,55 @@ REPORT_BUG_CONVERSATION = ConversationHandler(
 
 GAME_CONVERSATION = ConversationHandler(
 
-    entry_points=[
-
-        CommandHandler('start_game', game_start),
-        CommandHandler('top_players', top_players),
-
-    ],
+    entry_points=[MessageHandler(filters.Regex(answers.GAME_THROW), game_start)],
 
     allow_reentry=True,
 
-    conversation_timeout=300,
+    conversation_timeout=30,
 
     states={
+        DICE: [
 
+            CallbackQueryHandler(dice_game, pattern="game_start"),
+            CallbackQueryHandler(stop, pattern="game_stop"),
+
+        ],
         ADD_PLAYER: [
 
             MessageHandler(filters.TEXT, add_player),
-            CallbackQueryHandler(dice_game, pattern="dice_game"),
-            CallbackQueryHandler(stop, pattern="stop"),
+            CallbackQueryHandler(dice_game, pattern="game_start"),
+            CallbackQueryHandler(stop, pattern="game_stop"),
 
         ],
-
-        MAIN_GAME: [
-
-            MessageHandler(filters.Regex(r"[так | ні]"), dice_game),
-            CallbackQueryHandler(dice_game, pattern="dice_game"),
-            CallbackQueryHandler(stop, pattern="stop"),
-
-        ]
 
     },
 
     fallbacks=[
 
+        CommandHandler('stop_game', stop),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
+
+GAME_CHANGE_NAME_CONVERSATION = ConversationHandler(
+
+    entry_points=[MessageHandler(filters.Regex(answers.GAME_CHANGE), change_name)],
+
+    allow_reentry=True,
+
+    conversation_timeout=30,
+    states={
+        ADD_PLAYER: [
+
+            MessageHandler(filters.TEXT, add_player)
+
+        ],
+        CHANGE_NAME: [
+
+            MessageHandler(filters.TEXT, update_name),
+
+        ]
+    },
+    fallbacks=[
         CommandHandler('stop_game', stop),
         MessageHandler(filters.TEXT, misunderstand)
     ])
@@ -271,7 +287,9 @@ MAIN_CONVERSATION = ConversationHandler(
 
         GAME: [
 
-            GAME_CONVERSATION
+            GAME_CONVERSATION,
+            MessageHandler(filters.Regex(answers.GAME_TOP), top_players),
+            GAME_CHANGE_NAME_CONVERSATION
 
         ],
 
@@ -300,7 +318,7 @@ MAIN_CONVERSATION = ConversationHandler(
     ])
 
 REGISTRATION_CONVERSATION = ConversationHandler(
-    entry_points=[CommandHandler("start", start)],
+    entry_points=[CommandHandler("start", start), CommandHandler("register", start)],
     allow_reentry=True,
     states={
         GROUP:

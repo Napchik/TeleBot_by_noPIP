@@ -7,11 +7,11 @@
 
 from telegram.constants import ParseMode
 from loger_config import logger
-from Services.messages import START, REGISTRATION_INFO, MODERATOR_INFO, RoutineChoice
+from Services.messages import START, RE_START, REGISTRATION_INFO, MODERATOR_INFO, RoutineChoice
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ContextTypes
 from dataclasses import dataclass
-from Database.db_function_user import choose_role, add_user
+from Database.db_function_user import choose_role, add_user, check_user
 
 
 @dataclass
@@ -37,11 +37,17 @@ user_data = UserData()
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Displays the first welcome message for the user"""
     user = update.message.from_user
-
     user_data.name = user.first_name
     user_data.surname = user.last_name
     user_data.username = user.username
     user_data.id = user.id
+
+    if check_user(user.id) and update.message.text == "/start":
+        logger.info(f"User: {user.username}, user_id: {user.id}. The user has written 'start' but already registered.")
+        await context.bot.send_message(chat_id=user.id, text=RE_START, parse_mode=ParseMode.HTML,
+                                       reply_markup=ReplyKeyboardMarkup([[KeyboardButton(answers.GOT_IT)]],
+                                                                        one_time_keyboard=True, resize_keyboard=True))
+        return REG_EXIT
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started conversation.")
 
