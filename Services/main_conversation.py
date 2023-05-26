@@ -25,7 +25,7 @@ def moderator_mode(func):
         else:
 
             await context.bot.send_message(chat_id=user.id,
-                                           text="<b>Доступ заблоковано!</b>\nВи не є модератором групи!",
+                                           text="<b>Доступ заблоковано! 🔒</b>\nВи не є модератором групи!",
                                            parse_mode=ParseMode.HTML)
 
     return check_user
@@ -53,7 +53,7 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
                                            one_time_keyboard=True,
                                            resize_keyboard=True)
 
-    await context.bot.send_message(chat_id=user.id, text="<b>Головне меню:</b>", reply_markup=reply_markup,
+    await context.bot.send_message(chat_id=user.id, text="<b>Головне меню 📋:</b>", reply_markup=reply_markup,
                                    parse_mode=ParseMode.HTML)
 
     return MENU
@@ -87,13 +87,17 @@ async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started game conversation.")
 
-    text = """
-    <b>Гра в підкидання кубика.</b>
-    \n\nЩоб розпочати гру, напишіть <b>/start_game</b>
-    \nЩоб побачити топ 10 гравців, напишіть <b>/top_players</b>
-    """.lstrip()
+    text = """<b>Гра в підкидання кубика 🎲</b>"""
 
-    await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML)
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.GAME_THROW),
+                                         KeyboardButton(text=answers.GAME_TOP)],
+
+                                        [KeyboardButton(text=answers.GAME_CHANGE),
+                                         KeyboardButton(text=answers.BACK)]],
+                                       one_time_keyboard=True,
+                                       resize_keyboard=True)
+
+    await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
 
     return GAME
 

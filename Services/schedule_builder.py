@@ -28,7 +28,7 @@ class ScheduleBuilder:
         for lesson in self.__lessons.get_all_lessons():
 
             if lesson.name is not None:
-                text += f"{lesson.number}) <i>{lesson.time}</i>"
+                text += f"{lesson.number}) ⏰ <i>{lesson.time}</i>"
 
                 if len(lesson.url) <= 1:
                     text += f"\n<b><i><a href='{lesson.url[0]}'>{lesson.name}</a></i></b>"
@@ -41,7 +41,7 @@ class ScheduleBuilder:
         if text != "":
             return title + text
         else:
-            return title + "В цей день пар немає! Можна відпочивати! ;)"
+            return title + "В цей день пар немає! Можна відпочивати! 😴"
 
     def build_keyboard(self, callback: str) -> InlineKeyboardMarkup:
         """
@@ -69,8 +69,8 @@ class ScheduleBuilder:
 
         extended_keyboard = self._build_special_markup(callback)
 
-        extended_keyboard.append([InlineKeyboardButton(text="<", callback_data=step_back),
-                                  InlineKeyboardButton(text=">", callback_data=step_forward)])
+        extended_keyboard.append([InlineKeyboardButton(text="⬅️", callback_data=step_back),
+                                  InlineKeyboardButton(text="➡️", callback_data=step_forward)])
 
         return InlineKeyboardMarkup(extended_keyboard)
 

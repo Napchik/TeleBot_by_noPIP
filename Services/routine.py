@@ -11,6 +11,7 @@ from loger_config import logger
 from telegram.ext import ContextTypes
 from Services.schedule_builder import ScheduleBuilder
 from Database.db_function import all_groups, users_by_group
+from Database.db_function_user import change_is_blocked
 
 
 async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = ""):
@@ -28,6 +29,7 @@ async def routine(context: ContextTypes.DEFAULT_TYPE, day: int, title: str = "")
             pass
         except telegram.error.Forbidden:
             logger.warning(f"The user, with id - {user}, blocked the bot.")
+            change_is_blocked(user)
             pass
 
 
