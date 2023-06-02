@@ -7,7 +7,7 @@
 
 import os
 
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
 from loger_config import logger
 from Database.db_function import add_log
@@ -46,12 +46,13 @@ async def switch_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a group change.")
 
     text = """<b>
-    Введіть, будь ласка, Вашу групу.
-    \n(ХХ-ХХ)
-    \n\nНапишіть "Відмінити зміни" для скасування.</b>
+    Введіть, будь ласка, назву групи.
+    \n(ХХ-ХХ).</b>
     """
 
-    await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML,
+                                   reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text=answers.SETTINGS_DENY,
+                                                                                            callback_data="deny")]]))
 
     return CHANGE_GROUP
 
@@ -109,8 +110,8 @@ async def cancel_change(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user canceled a group change.")
-
-    await update.message.reply_text(text="Окей! Дані не будуть збережні ❌", parse_mode=ParseMode.HTML)
+    query = update.callback_query
+    await query.edit_message_text(text="Окей! Дані не будуть збережні", parse_mode=ParseMode.HTML)
 
     return ConversationHandler.END
 

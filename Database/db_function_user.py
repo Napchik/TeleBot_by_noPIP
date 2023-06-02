@@ -3,7 +3,7 @@
                  are used to execute/insert some data from/to Database.
 
           Database consists of some tables:
-              log             -- id, parsing_time, status
+              log             -- id, time, info
               info_global     -- week, time_lesson1, time_lesson2, time_lesson3, time_lesson4, time_lesson5,
                                     time_lesson6, day2, day3, day4, day5, day6, day1,
                                     day2, day3, day4, day5, day6, day7 ,day8, day9, day10, day11, day12, day13, day14

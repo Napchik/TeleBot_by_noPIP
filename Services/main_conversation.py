@@ -38,8 +38,8 @@ async def start_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started main conversation.")
 
     if check_user_role(user.id) == "user":
-        reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE)],
-                                            [KeyboardButton(text=answers.MAIN_SETTINGS)],
+        reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.MAIN_SCHEDULE),
+                                             KeyboardButton(text=answers.MAIN_SETTINGS)],
 
                                             [KeyboardButton(text=answers.MAIN_GAME)]],
                                            one_time_keyboard=True,

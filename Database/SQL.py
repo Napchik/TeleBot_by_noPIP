@@ -5,7 +5,6 @@
     Author: Mikhail Shikalovskyi
     Version: 2.0
 """
-
 import sqlite3
 import os
 from loger_config import logger

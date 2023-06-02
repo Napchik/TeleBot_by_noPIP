@@ -7,7 +7,7 @@
 
 from telegram.ext import ContextTypes
 from Services.routine import routine
-from Database.db_function import today_day
+from Database.db_function import today_day, change_week
 from Database.db_function_user import deleting_blocked_user
 from Database.schedule_uploader import schedule_info_uploader
 
@@ -25,3 +25,4 @@ async def schedule_for_tomorrow(context: ContextTypes.DEFAULT_TYPE):
 async def daily_routine(context: ContextTypes.DEFAULT_TYPE):
     schedule_info_uploader()
     deleting_blocked_user()
+    change_week()

@@ -79,6 +79,11 @@ from game import (
     stop, top_players, change_name, update_name
 )
 
+from Services.controls_conversation import (
+    choose_lesson_link,
+    CONTROLS_CHOOSE_LESSON,
+)
+
 from Services.messages import RoutineChoice
 
 import re
@@ -179,7 +184,7 @@ SWITCH_GROUP_CONVERSATION = ConversationHandler(
 
     fallbacks=[
 
-        MessageHandler(filters.Regex(answers.SETTINGS_DENY), cancel_change),
+        CallbackQueryHandler(cancel_change, pattern="deny"),
         MessageHandler(filters.Regex(answers.BACK), back_to_main),
         MessageHandler(filters.TEXT, misunderstand)
     ])
@@ -263,6 +268,27 @@ GAME_CHANGE_NAME_CONVERSATION = ConversationHandler(
         MessageHandler(filters.TEXT, misunderstand)
     ])
 
+CONTROLS_LINK_CONVERSATION = ConversationHandler(
+
+    entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_LINKS), choose_lesson_link)],
+
+    allow_reentry=True,
+
+    conversation_timeout=60,
+
+    states={
+
+        CONTROLS_CHOOSE_LESSON: [
+            # CallbackQueryHandler(previous_lesson, pattern="previous_lesson"),
+            # CallbackQueryHandler(next_lesson, pattern="next_lesson")
+        ]},
+
+    fallbacks=[
+
+        MessageHandler(filters.Regex(answers.BACK), back_to_main),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
+
 MAIN_CONVERSATION = ConversationHandler(
 
     entry_points=[
@@ -305,10 +331,12 @@ MAIN_CONVERSATION = ConversationHandler(
             SWITCH_GROUP_CONVERSATION,
             REPORT_BUG_CONVERSATION
 
+        ],
+        CONTROLS: [
+            CONTROLS_LINK_CONVERSATION
         ]
-    },
 
-    # CONTROLS: []},
+    },
 
     fallbacks=[
 

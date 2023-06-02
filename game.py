@@ -82,9 +82,10 @@ async def dice_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return data["dice"]["value"]
 
     data_user = await roll_dice(update.effective_chat.id, 'Ви 👨 підкидаєте кубик')
+    await sleep(5)
 
     data_bot = await roll_dice(update.effective_chat.id, 'Бот 🤖 підкидає кубик')
-
+    await sleep(5)
 
     if data_bot > data_user:
         await context.bot.send_message(chat_id=update.effective_chat.id, text='Бот виграв 🌧')
@@ -128,7 +129,7 @@ async def top_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """End Game"""
     user = update.effective_user
-
+    query = update.callback_query
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has ended the game.")
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="До наступної гри!")
+    await query.edit_message_text(text="До наступної гри!")
     return ConversationHandler.END
