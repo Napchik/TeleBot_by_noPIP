@@ -6,7 +6,7 @@
 """
 
 from Services.lessons import Lessons
-from Database.db_function import group_by_user
+from Database.db_function_user import check_user_group
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -14,7 +14,7 @@ class ScheduleBuilder:
     """Class day represents the daily schedule"""
 
     def __init__(self, user_id, day: int):
-        self.__group = group_by_user(user_id)
+        self.__group = check_user_group(user_id)
         self.__lessons = Lessons(self.__group, day)
 
     def build_text(self, title: str = "") -> str:

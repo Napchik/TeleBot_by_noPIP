@@ -8,7 +8,7 @@
 from telegram.constants import ParseMode
 from loger_config import logger
 from Services.messages import START, RE_START, REGISTRATION_INFO, MODERATOR_INFO, RoutineChoice
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import ContextTypes
 from dataclasses import dataclass
 from Database.db_function_user import choose_role, add_user, check_user
@@ -51,7 +51,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started conversation.")
 
-    await context.bot.send_message(chat_id=user.id, text=START, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user.id, text=START, parse_mode=ParseMode.HTML,
+                                   reply_markup=ReplyKeyboardRemove())
 
     return GROUP
 
@@ -140,10 +141,13 @@ async def misunderstand(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has canceled the conversation.")
-
-    await update.message.reply_text(text="Окей! Дані не будуть збережні.",
-                                    parse_mode=ParseMode.HTML,
-                                    reply_markup=ReplyKeyboardMarkup([[KeyboardButton(answers.GOT_IT)]],
-                                                                     one_time_keyboard=True, resize_keyboard=True))
-
-    return REG_EXIT
+    if check_user(user.id):
+        await update.message.reply_text(text="Окей! Дані не будуть збережні.",
+                                        parse_mode=ParseMode.HTML,
+                                        reply_markup=ReplyKeyboardMarkup([[KeyboardButton(answers.GOT_IT)]],
+                                                                         one_time_keyboard=True, resize_keyboard=True))
+        return REG_EXIT
+    else:
+        await update.message.reply_text(text="Окей! Ви ще не зареєстровані, щоб зареєструватися - напишіть /start",
+                                        parse_mode=ParseMode.HTML,
+                                        reply_markup=ReplyKeyboardRemove())
