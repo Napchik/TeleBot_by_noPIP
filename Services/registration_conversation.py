@@ -7,47 +7,43 @@
 
 from telegram.constants import ParseMode
 from loger_config import logger
-from Services.messages import START, RE_START, REGISTRATION_INFO, MODERATOR_INFO, RoutineChoice
+from Services.messages import START, REGISTRATION_INFO, MODERATOR_INFO, RoutineChoice
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from telegram.ext import ContextTypes
-from dataclasses import dataclass
-from Database.db_function_user import choose_role, add_user, check_user
+from telegram.ext import ContextTypes, ConversationHandler
+from Database.db_function_user import choose_role, add_user
 
 
-@dataclass
 class UserData:
-    name: str = None
-    surname: str = None
-    username: str = None
-    id: int = None
-    group: str = None
-    schedule_mode: int = None
-    role: str = None
+    def __init__(self, user_id):
+        self.user_id: int = user_id
+        self.name: str | None = None
+        self.surname: str | None = None
+        self.username: str | None = None
+        self.group: str | None = None
+        self.schedule_mode: int | None = None
+        self.role: str | None = None
 
     def send_data(self):
-        add_user(self.name, self.surname, self.username, self.id, self.group, self.schedule_mode, self.role)
+        add_user(self.name, self.surname, self.username, self.user_id, self.group, self.schedule_mode, self.role)
 
 
 GROUP, ROUTINE, REG_INFO, REG_EXIT = map(chr, range(4))
 answers = RoutineChoice.Answers
 results = RoutineChoice.Results
-user_data = UserData()
+users_dictionary: dict[int: UserData] = {}
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def start_reg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Displays the first welcome message for the user"""
     user = update.message.from_user
+    global users_dictionary
+
+    users_dictionary[user.id] = UserData(user_id=user.id)
+    user_data = users_dictionary[user.id]
     user_data.name = user.first_name
     user_data.surname = user.last_name
     user_data.username = user.username
-    user_data.id = user.id
-
-    if check_user(user.id) and update.message.text == "/start":
-        logger.info(f"User: {user.username}, user_id: {user.id}. The user has written 'start' but already registered.")
-        await context.bot.send_message(chat_id=user.id, text=RE_START, parse_mode=ParseMode.HTML,
-                                       reply_markup=ReplyKeyboardMarkup([[KeyboardButton(answers.GOT_IT)]],
-                                                                        one_time_keyboard=True, resize_keyboard=True))
-        return REG_EXIT
+    user_data.user_id = user.id
 
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started conversation.")
 
@@ -60,8 +56,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Prompts the user for their group"""
     user = update.message.from_user
+    global users_dictionary
     group_name: str = update.message.text.upper()
 
+    user_data = users_dictionary[user.id]
     user_data.group = group_name
 
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.REG_NO),
@@ -83,6 +81,8 @@ async def group(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     user = update.message.from_user
     answer = update.message.text
+    global users_dictionary
+    user_data = users_dictionary[user.id]
 
     markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.GOT_IT),
                                    KeyboardButton(text=answers.CANCEL)]],
@@ -106,6 +106,8 @@ async def routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
+    global users_dictionary
+    user_data = users_dictionary[user.id]
 
     user_data.role = choose_role(user_data.group)
 
@@ -127,6 +129,8 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User: {user.username}, user_id: {user.id}. User successfully completed registration."
                 f"\nUser data: {user_data}")
 
+    del users_dictionary[user.id]
+
     return REG_EXIT
 
 
@@ -140,14 +144,14 @@ async def misunderstand(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
+    global users_dictionary
+
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has canceled the conversation.")
-    if check_user(user.id):
-        await update.message.reply_text(text="Окей! Дані не будуть збережні.",
-                                        parse_mode=ParseMode.HTML,
-                                        reply_markup=ReplyKeyboardMarkup([[KeyboardButton(answers.GOT_IT)]],
-                                                                         one_time_keyboard=True, resize_keyboard=True))
-        return REG_EXIT
-    else:
-        await update.message.reply_text(text="Окей! Ви ще не зареєстровані, щоб зареєструватися - напишіть /start",
-                                        parse_mode=ParseMode.HTML,
-                                        reply_markup=ReplyKeyboardRemove())
+
+    await update.message.reply_text(text="❌ Ви перервали реєстрацію."
+                                         "\nЩоб продовжити спілкування з ботом - напишіть /start",
+                                    parse_mode=ParseMode.HTML,
+                                    reply_markup=ReplyKeyboardRemove())
+
+    del users_dictionary[user.id]
+    return ConversationHandler.END

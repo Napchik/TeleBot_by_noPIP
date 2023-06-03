@@ -46,9 +46,9 @@ def check_user_role(user_id: int):
 
 def transfer_role(user_id: int, new_user_id: int):
     """Function which transfers role from 'moderator' to other user"""
-    filter = f"UPDATE users SET role = 'moderator' WHERE user_id = '{new_user_id}'"
-    SQL.table_operate(filter)
     filter = f"UPDATE users SET role = 'user' WHERE user_id = '{user_id}'"
+    SQL.table_operate(filter)
+    filter = f"UPDATE users SET role = 'moderator' WHERE user_id = '{new_user_id}'"
     SQL.table_operate(filter)
     db_function.add_log(f"Transfer successful from {user_id} to {new_user_id}")
 
@@ -69,7 +69,7 @@ def users_nickname_by_group(user_group: int):
 
 def count_moderators(group_name: str):
     """Function which checks quantity of moderators in group and returns name on role chosen"""
-    filter = f"SELECT user_id FROM users WHERE role = 'moderator'"
+    filter = f"SELECT user_id FROM users WHERE role = 'moderator' AND group_name = '{group_name}'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return len(result)
 

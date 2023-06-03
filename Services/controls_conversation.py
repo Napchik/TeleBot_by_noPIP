@@ -1,19 +1,36 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove, ReplyKeyboardMarkup, \
-    KeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
 from loger_config import logger
-from Database.db_function_user import list_lessons, check_user_group, users_nickname_by_group, transfer_role, \
-    get_userid_by_nickname, count_moderators
 from Database.db_function import update_link_by_subject
 from telegram.constants import ParseMode
 from Services.messages import RoutineChoice
 
+from telegram import (
+    Update,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    ReplyKeyboardRemove,
+    ReplyKeyboardMarkup,
+    KeyboardButton
+)
+
+from Database.db_function_user import (
+    list_lessons,
+    check_user_group,
+    users_nickname_by_group,
+    transfer_role,
+    get_userid_by_nickname,
+    count_moderators
+)
+
+
 answers = RoutineChoice.Answers
-CONTROLS_CHOOSE_LESSON = chr(25)
-CONTROLS_UPDATE_LINK = chr(26)
-CHECK_CORRECT = chr(27)
-CONTROLS_CHOOSE_USER = chr(28)
-CHECK_ROLE_CORRECT = chr(29)
+(
+    CONTROLS_CHOOSE_LESSON,
+    CONTROLS_UPDATE_LINK,
+    CHECK_CORRECT,
+    CONTROLS_CHOOSE_USER,
+    CHECK_ROLE_CORRECT
+) = map(chr, range(25, 30))
 
 chosen_lesson = int()
 chosen_user = int()
@@ -27,7 +44,9 @@ async def choose_lesson_from_list(update: Update, context: ContextTypes.DEFAULT_
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a change lesson link.")
     lessons = list_lessons(check_user_group(user.id))
 
-    text = f"<b>Виберіть предмет, щоб змінити посилання на нього:</b>\n\n{current_lesson_id + 1}. {lessons[current_lesson_id]}"
+    text = f"<b>Виберіть предмет, щоб змінити посилання на нього:</b>" \
+           f"\n\n{current_lesson_id + 1}. {lessons[current_lesson_id]}"
+
     for _ in range(len(lessons) - 1):
         current_lesson_id += 1
         text += f"\n\n{current_lesson_id + 1}. {lessons[current_lesson_id]}"
@@ -63,9 +82,11 @@ async def check_update_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text=answers.GAME_START, callback_data="confirm"),
                                           InlineKeyboardButton(text=answers.SETTINGS_DENY,
                                                                callback_data="cancel_change")]])
+    text = f"Підтвердіть зміну: " \
+           f"\n{chosen_lesson}. {list_lessons(check_user_group(user.id))[chosen_lesson - 1]} - {chosen_link}"
 
     await context.bot.send_message(chat_id=user.id,
-                                   text=f"Підтвердіть зміну: \n{chosen_lesson}. {list_lessons(check_user_group(user.id))[chosen_lesson - 1]} - {chosen_link}",
+                                   text=text,
                                    parse_mode=ParseMode.HTML, reply_markup=reply_markup)
     return CHECK_CORRECT
 
@@ -126,9 +147,11 @@ async def update_role_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.GOT_IT)]],
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
-    if moderators > 3 or moderators <= 0:
+    text = "Помилка! Ви не можете передати свою роль у цій групі.\nПоверніться у свою вихідну групу."
+
+    if moderators > 3 or moderators <= 0: # if moderators in range(0, 4)
         await context.bot.send_message(chat_id=user.id,
-                                       text="Помилка! Ви не моежете передати свою роль у цій групі.\nПоверніться у свою вихідну групу.",
+                                       text=text,
                                        parse_mode=ParseMode.HTML, reply_markup=reply_markup)
     else:
         transfer_role(user.id,
