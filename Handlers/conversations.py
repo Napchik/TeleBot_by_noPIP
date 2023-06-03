@@ -80,8 +80,19 @@ from game import (
 )
 
 from Services.controls_conversation import (
-    choose_lesson_link,
+    choose_lesson_from_list,
+    put_link,
+    check_update_link,
+    update_link_db,
+    choose_user_from_list,
+    check_update_role,
+    update_role_db,
     CONTROLS_CHOOSE_LESSON,
+    CONTROLS_UPDATE_LINK,
+    CHECK_CORRECT,
+    CHECK_ROLE_CORRECT,
+    CONTROLS_CHOOSE_USER
+
 )
 
 from Services.messages import RoutineChoice
@@ -270,7 +281,7 @@ GAME_CHANGE_NAME_CONVERSATION = ConversationHandler(
 
 CONTROLS_LINK_CONVERSATION = ConversationHandler(
 
-    entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_LINKS), choose_lesson_link)],
+    entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_LINKS), choose_lesson_from_list)],
 
     allow_reentry=True,
 
@@ -279,12 +290,44 @@ CONTROLS_LINK_CONVERSATION = ConversationHandler(
     states={
 
         CONTROLS_CHOOSE_LESSON: [
-            # CallbackQueryHandler(previous_lesson, pattern="previous_lesson"),
-            # CallbackQueryHandler(next_lesson, pattern="next_lesson")
-        ]},
+            MessageHandler(filters.Regex(r'[0-9]'), put_link),
+        ],
+        CONTROLS_UPDATE_LINK: [
+            MessageHandler(filters.Entity("url"), check_update_link),
+        ],
+        CHECK_CORRECT: [
+            CallbackQueryHandler(update_link_db, pattern="confirm"),
+            CallbackQueryHandler(cancel_change, pattern="cancel_change"),
+        ]
+    },
 
     fallbacks=[
+        MessageHandler(filters.Regex(answers.BACK), back_to_main),
+        MessageHandler(filters.TEXT, misunderstand)
+    ])
 
+
+CONTROLS_ROLE_CONVERSATION = ConversationHandler(
+
+    entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_ROLE), choose_user_from_list)],
+
+    allow_reentry=True,
+
+    conversation_timeout=60,
+
+    states={
+
+        CONTROLS_CHOOSE_USER: [
+            MessageHandler(filters.Regex(r'[0-9]'), check_update_role)
+        ],
+        CHECK_ROLE_CORRECT: [
+            CallbackQueryHandler(update_role_db, pattern="confirm"),
+            CallbackQueryHandler(cancel_change, pattern="cancel_change")
+        ],
+    },
+
+    fallbacks=[
+        MessageHandler(filters.Regex(answers.GOT_IT), back_to_main),
         MessageHandler(filters.Regex(answers.BACK), back_to_main),
         MessageHandler(filters.TEXT, misunderstand)
     ])
@@ -333,7 +376,8 @@ MAIN_CONVERSATION = ConversationHandler(
 
         ],
         CONTROLS: [
-            CONTROLS_LINK_CONVERSATION
+            CONTROLS_LINK_CONVERSATION,
+            CONTROLS_ROLE_CONVERSATION
         ]
 
     },

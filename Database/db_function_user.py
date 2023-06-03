@@ -8,7 +8,7 @@
                                     time_lesson6, day2, day3, day4, day5, day6, day1,
                                     day2, day3, day4, day5, day6, day7 ,day8, day9, day10, day11, day12, day13, day14
               info_professor  -- group_name, subject, name, type, link
-              info_users      -- user_id, user_name, user_surname, nick_name
+              info_users      -- user_id, user_name, user_surname, user_nickname
               list_groups     -- group_name
               schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
               users           -- user_id, group_name, schedule_switch, status, is_blocked
@@ -42,6 +42,36 @@ def check_user_role(user_id: int):
     filter = f"SELECT role FROM users WHERE user_id = '{user_id}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
+
+
+def transfer_role(user_id: int, new_user_id: int):
+    """Function which transfers role from 'moderator' to other user"""
+    filter = f"UPDATE users SET role = 'moderator' WHERE user_id = '{new_user_id}'"
+    SQL.table_operate(filter)
+    filter = f"UPDATE users SET role = 'user' WHERE user_id = '{user_id}'"
+    SQL.table_operate(filter)
+    db_function.add_log(f"Transfer successful from {user_id} to {new_user_id}")
+
+
+def get_userid_by_nickname(user_nickname: str):
+    """Function which checks role of user in database"""
+    filter = f"SELECT user_id FROM info_users WHERE user_nickname = '{user_nickname}'"
+    result = reformation_data.reformat_int(SQL.execute(filter))
+    return result
+
+
+def users_nickname_by_group(user_group: int):
+    """Function which checks role of user in database"""
+    filter = f"SELECT user_nickname FROM info_users JOIN users ON info_users.user_id = users.user_id WHERE users.group_name = '{user_group}'"
+    result = reformation_data.reformat_list(SQL.execute(filter))
+    return result
+
+
+def count_moderators(group_name: str):
+    """Function which checks quantity of moderators in group and returns name on role chosen"""
+    filter = f"SELECT user_id FROM users WHERE role = 'moderator'"
+    result = reformation_data.reformat_list(SQL.execute(filter))
+    return len(result)
 
 
 def choose_role(group_name: str):

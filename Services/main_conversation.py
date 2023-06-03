@@ -123,7 +123,7 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return SETTINGS
 
 
-@moderator_mode
+#@moderator_mode
 async def controls(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Open Controls Conversation"""
     user = update.message.from_user
