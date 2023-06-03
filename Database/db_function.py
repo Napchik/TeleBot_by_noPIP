@@ -119,7 +119,7 @@ def day_name(day: int):
     return result
 
 
-def inserter_schedule(week: str, group: str, data: list):
+def inserter_schedule(week: str, group: str, data: dict):
     """Function inserts or updates schedule for a group"""
     if week == "week1":
         counter = 1
@@ -141,7 +141,7 @@ def inserter_schedule(week: str, group: str, data: list):
     logger.info("Schedule has been inserted into database")
 
 
-def inserter_professor(week: str, group: str, data: list):
+def inserter_professor(week: str, group: str, data: dict):
     """Function inserts or updates professors for a group"""
     for days in data[f"{week}"]:
         for lessons_professors in days:

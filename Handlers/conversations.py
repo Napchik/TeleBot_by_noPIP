@@ -10,7 +10,7 @@ from Services.registration_conversation import (
     ROUTINE,
     REG_INFO,
     REG_EXIT,
-    start,
+    start_reg,
     group,
     routine,
     info,
@@ -93,6 +93,13 @@ from Services.controls_conversation import (
     CHECK_ROLE_CORRECT,
     CONTROLS_CHOOSE_USER
 
+)
+
+from Services.start_conversation import (
+    start_communication,
+    cancel_communication,
+    RUN_MAIN,
+    RUN_REG
 )
 
 from Services.messages import RoutineChoice
@@ -306,7 +313,6 @@ CONTROLS_LINK_CONVERSATION = ConversationHandler(
         MessageHandler(filters.TEXT, misunderstand)
     ])
 
-
 CONTROLS_ROLE_CONVERSATION = ConversationHandler(
 
     entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_ROLE), choose_user_from_list)],
@@ -335,8 +341,6 @@ CONTROLS_ROLE_CONVERSATION = ConversationHandler(
 MAIN_CONVERSATION = ConversationHandler(
 
     entry_points=[
-
-        CommandHandler("menu", start_main),
         MessageHandler(filters.Regex(answers.BACK), start_main),
         MessageHandler(filters.Regex(answers.GOT_IT), start_main),
     ],
@@ -390,9 +394,12 @@ MAIN_CONVERSATION = ConversationHandler(
     ])
 
 REGISTRATION_CONVERSATION = ConversationHandler(
-    entry_points=[CommandHandler("start", start), CommandHandler("register", start)],
+    entry_points=[
+        CommandHandler("reg", start_reg),
+        MessageHandler(filters.Regex(answers.REG_START), start_reg)],
     allow_reentry=True,
     states={
+
         GROUP:
             [
                 MessageHandler(filters.Regex(pattern_ua), group)
@@ -421,4 +428,24 @@ REGISTRATION_CONVERSATION = ConversationHandler(
     fallbacks=[
         CommandHandler("cancel", cancel),
         MessageHandler(filters.Regex(answers.CANCEL), cancel),
+        MessageHandler(filters.TEXT, misunderstand)])
+
+START_CONVERSATION = ConversationHandler(
+    entry_points=[CommandHandler("start", start_communication)],
+    allow_reentry=True,
+    states={
+
+        RUN_MAIN:
+            [
+                MessageHandler(filters.Regex(answers.CANCEL), cancel_communication),
+                MAIN_CONVERSATION
+            ],
+
+        RUN_REG:
+            [
+                MessageHandler(filters.Regex(answers.CANCEL), cancel_communication),
+                REGISTRATION_CONVERSATION
+            ]
+    },
+    fallbacks=[
         MessageHandler(filters.TEXT, misunderstand)])
