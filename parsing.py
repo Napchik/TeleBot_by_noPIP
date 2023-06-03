@@ -17,6 +17,7 @@ import re
 
 from loger_config import logger
 from bs4 import BeautifulSoup
+import Database.db_function_user as db_function
 
 
 class Parser:
@@ -170,6 +171,7 @@ class Parser:
         self._response_handler(url=self.start_url, method="post")
         if self.response.status_code != 302:
             logger.critical(f"Group '{group}' doesn't exists")
+            db_function.delete_group(group)
             return self.parsed_data
 
         self.last_url = "http://epi.kpi.ua" + self.response.headers["Location"]

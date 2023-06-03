@@ -11,7 +11,7 @@
               info_users      -- user_id, user_name, user_surname, user_nickname
               list_groups     -- group_name
               schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
-              users           -- user_id, group_name, schedule_switch, status, is_blocked
+              users           -- user_id, group_name, schedule_switch, role, is_blocked
               game            -- user_id, user_name_game, total_score, total_games
 
     Author: Mikhail Shikalovskyi
@@ -20,6 +20,7 @@
 import Database.reformattion_data as reformation_data
 import Database.SQL as SQL
 import Database.db_function as db_function
+import parsing
 from loger_config import logger
 
 
@@ -62,7 +63,7 @@ def get_userid_by_nickname(user_nickname: str):
 
 def users_nickname_by_group(user_group: int):
     """Function which checks role of user in database"""
-    filter = f"SELECT user_nickname FROM info_users JOIN users ON info_users.user_id = users.user_id WHERE users.group_name = '{user_group}'"
+    filter = f"SELECT user_nickname FROM info_users JOIN users ON info_users.user_id = users.user_id WHERE users.group_name = '{user_group}' AND users.role = 'user'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
 
@@ -76,7 +77,7 @@ def count_moderators(group_name: str):
 
 def choose_role(group_name: str):
     """Function which checks quantity of moderators in group and returns name on role chosen"""
-    filter = f"SELECT user_id FROM users WHERE group_name = '{group_name}'"
+    filter = f"SELECT user_id FROM users WHERE group_name = '{group_name}' AND role = 'moderator'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     if len(result) < 3:
         return "moderator"
@@ -118,10 +119,10 @@ def update_schedule_switch(user_id: int, schedule_switch: int):
         SQL.table_operate(filter)
 
 
-def change_group(user_id: int, group_name: str):
+def change_group(user_id: int, group_name: str, role: str):
     """Function to change user group"""
-    if check_user(user_id) is True:
-        filter = f"UPDATE users SET group_name = '{group_name}' WHERE user_id = '{user_id}'"
+    if check_user(user_id) is True and check_user_group(user_id) != group_name:
+        filter = f"UPDATE users SET group_name = '{group_name}', role = '{role}' WHERE user_id = '{user_id}'"
         SQL.table_operate(filter)
 
 
@@ -135,6 +136,19 @@ def add_new_group(group: str):
     """Function to add new group in list of groups"""
     filter = f"INSERT INTO list_groups ('group_name') VALUES ('{group}')"
     SQL.table_operate(filter)
+    parser = parsing.Parser()
+    data = parser.parse(group=group)
+    for week in data:
+        db_function.inserter_schedule(week, group, data)
+        db_function.inserter_professor(week, group, data)
+    db_function.add_log(f"New group {group} added, schedule parsed.")
+
+
+def delete_group(group: str):
+    """Function to delete groups which not existed in list of groups"""
+    filter = f"DELETE FROM list_groups WHERE group_name = '{group}'"
+    SQL.table_operate(filter)
+    db_function.add_log(f"Group {group} deleted.")
 
 
 def change_is_blocked(user_id: int):
