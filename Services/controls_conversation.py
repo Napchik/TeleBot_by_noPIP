@@ -22,7 +22,6 @@ from Database.db_function_user import (
     count_moderators
 )
 
-
 answers = RoutineChoice.Answers
 (
     CONTROLS_CHOOSE_LESSON,
@@ -43,6 +42,10 @@ async def choose_lesson_from_list(update: Update, context: ContextTypes.DEFAULT_
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a change lesson link.")
     lessons = list_lessons(check_user_group(user.id))
+    if len(lessons) == 0:
+        text = "У базі нема розкладу для Вашої групи. \nМожливо Ви вказали не дійсну групу, або розкладу ще немає."
+        await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML)
+        return ConversationHandler.END
 
     text = f"<b>Виберіть предмет, щоб змінити посилання на нього:</b>" \
            f"\n\n{current_lesson_id + 1}. {lessons[current_lesson_id]}"
@@ -110,6 +113,11 @@ async def choose_user_from_list(update: Update, context: ContextTypes.DEFAULT_TY
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a change lesson link.")
     users = users_nickname_by_group(check_user_group(user.id))
 
+    if len(users) == 0:
+        text = "У Вашій групі нема користувачів, яким можна передати Вашу роль."
+        await context.bot.send_message(chat_id=user.id, text=text, parse_mode=ParseMode.HTML)
+        return ConversationHandler.END
+
     text = f"<b>Виберіть користувача щоб передати роль:</b>\n\n{current_user + 1}. {users[current_user]}"
     for _ in range(len(users) - 1):
         current_user += 1
@@ -149,13 +157,13 @@ async def update_role_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                        resize_keyboard=True)
     text = "Помилка! Ви не можете передати свою роль у цій групі.\nПоверніться у свою вихідну групу."
 
-    if moderators > 3 or moderators <= 0: # if moderators in range(0, 4)
+    if moderators not in range(0, 4):
         await context.bot.send_message(chat_id=user.id,
                                        text=text,
                                        parse_mode=ParseMode.HTML, reply_markup=reply_markup)
-    else:
-        transfer_role(user.id,
-                      get_userid_by_nickname(users_nickname_by_group(check_user_group(user.id))[chosen_user - 1]))
-        await context.bot.send_message(chat_id=user.id, text="Успішно передано ✅", reply_markup=reply_markup)
+        return ConversationHandler.END
+
+    transfer_role(user.id, get_userid_by_nickname(users_nickname_by_group(check_user_group(user.id))[chosen_user - 1]))
+    await context.bot.send_message(chat_id=user.id, text="Успішно передано ✅", reply_markup=reply_markup)
 
     return ConversationHandler.END

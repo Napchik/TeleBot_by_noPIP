@@ -11,7 +11,8 @@ from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboard
 from telegram.ext import ContextTypes, ConversationHandler
 from loger_config import logger
 from Database.db_function import add_log
-from Database.db_function_user import update_schedule_switch, change_group, add_new_group, check_group
+from Database.db_function_user import update_schedule_switch, change_group, add_new_group, check_group, choose_role, \
+    check_user_group
 from telegram.constants import ParseMode
 from Services.messages import RoutineChoice
 
@@ -97,12 +98,16 @@ async def update_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     new_group = update.message.text.upper()
     if not check_group(new_group):
         add_new_group(new_group)
+    if check_user_group(user.id) == new_group:
+        await context.bot.send_message(chat_id=user.id, text=f"<b>Ви вже в групі {new_group}</b>",
+                                       parse_mode=ParseMode.HTML)
+        return ConversationHandler.END
 
-    change_group(user.id, new_group)
+    change_group(user.id, new_group, choose_role(new_group))
 
     await context.bot.send_message(chat_id=user.id, text="<b>Групу змінено успішно ✅</b>", parse_mode=ParseMode.HTML)
-
     return ConversationHandler.END
+
 
 
 async def cancel_change(update: Update, context: ContextTypes.DEFAULT_TYPE):
