@@ -109,7 +109,7 @@ async def cancel_change(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Cancel Group Change for User"""
 
     user = update.effective_user
-    logger.info(f"User: {user.username}, user_id: {user.id}. The user canceled a group change.")
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user canceled change.")
     query = update.callback_query
     await query.edit_message_text(text="Окей! Дані не будуть збережні", parse_mode=ParseMode.HTML)
 

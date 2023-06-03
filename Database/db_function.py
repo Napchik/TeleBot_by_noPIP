@@ -8,7 +8,7 @@
                                     time_lesson6, day2, day3, day4, day5, day6, day1,
                                     day2, day3, day4, day5, day6, day7 ,day8, day9, day10, day11, day12, day13, day14
               info_professor  -- group_name, subject, name, type, link
-              info_users      -- user_id, user_name, user_surname, nick_name
+              info_users      -- user_id, user_name, user_surname, user_nickname
               list_groups     -- group_name
               schedule        -- group_name, day1, day2, day3, day4, day5, day6 ,day8, day9, day10, day11, day12, day13
               users           -- user_id, group_name, schedule_switch, status, is_blocked
@@ -96,6 +96,13 @@ def link_by_subject(group: str, subject: str):
     filter = f"SELECT link FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
+
+
+def update_link_by_subject(group: str, subject: str, new_link: str):
+    """Function to update link by group and subject name"""
+    filter = f"UPDATE info_professor SET link = '{new_link}' WHERE group_name='{group}' AND subject = '{subject}'"
+    SQL.table_operate(filter)
+    add_log(f"{group}: Link changed successfully")
 
 
 def time_by_number(number: int):
