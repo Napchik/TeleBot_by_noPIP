@@ -1,8 +1,8 @@
 """
-    Description: Contains logic of week schedule conversation.
+    Description: Contains logic of weekly schedule conversations (for week or all).
 
     Author: Ivan Maruzhenko
-    Version: 0.2
+    Version: 1.0
 """
 
 from telegram import Update
@@ -12,25 +12,28 @@ from Services.schedule_builder import ScheduleBuilder
 from Services.daily_schedule_conversation import send_links, clear_markup
 from Database.db_function import today_day, get_week, day_name
 from telegram.constants import ParseMode
+from Services.conversation_states import (
+    WEEK_SCHEDULE,
+    ALL_SCHEDULE
+)
 
-current_week_day: int = today_day()
-current_day: int = today_day()
-current_week: int = get_week()
 week_borders = {1: (1, 7), 2: (8, 14)}
-WEEK_SCHEDULE, ALL_SCHEDULE = map(chr, range(8, 10))
-link_message_id: bool = False
 
 
 async def send_week_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Schedule for current week"""
+    """
+        Sends a carousel of weekly schedules
 
-    global current_week_day
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself;
 
-    current_week_day = today_day()
+        :return: state 'WEEK_SCHEDULE' of the SCHEDULE_CONVERSATION.
+    """
+
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a weekly schedule.")
 
-    builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, current_week_day)
+    builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, today_day())
     await update.message.reply_text(text=builder.build_text("<b>РОЗКЛАД НА СЬОГОДНІ:</b>"),
                                     parse_mode=ParseMode.HTML,
                                     reply_markup=builder.build_extended_keyboard(step_back="previous_day",
@@ -41,37 +44,54 @@ async def send_week_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def next_day_in_week(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global current_week_day
+    """
+        Switches to the next day in a particular week
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
+    current_week_day = find_day(update, context)
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a schedule for the next day.")
 
-    if current_week_day != week_borders.get(current_week)[1]:
+    if current_week_day != week_borders.get(get_week())[1]:
         current_week_day += 1
     else:
-        current_week_day = week_borders.get(current_week)[0]
+        current_week_day = week_borders.get(get_week())[0]
 
-    await _week_schedule_message(update, context)
+    await _week_schedule_message(update, context, current_week_day)
 
 
 async def previous_day_in_week(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global current_week_day
+    """
+        Switches to the previous day in a particular week
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
+    current_week_day = find_day(update, context)
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a schedule for the previous day.")
 
-    if current_week_day != week_borders.get(current_week)[0]:
+    if current_week_day != week_borders.get(get_week())[0]:
         current_week_day -= 1
     else:
-        current_week_day = week_borders.get(current_week)[1]
+        current_week_day = week_borders.get(get_week())[1]
 
-    await _week_schedule_message(update, context)
+    await _week_schedule_message(update, context, current_week_day)
 
 
 async def send_all_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """All schedule"""
+    """
+        Sends a carousel of all schedule
 
-    global current_day
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself;
+
+        :return: state 'ALL_SCHEDULE' of the SCHEDULE_CONVERSATION.
+    """
 
     current_day = today_day()
     user = update.effective_user
@@ -88,9 +108,15 @@ async def send_all_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def next_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global current_day
+    """
+        Switches to the next day in all schedule
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
+    current_day = find_day(update, context)
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a schedule for the next day.")
 
     if current_day != 14:
@@ -98,13 +124,19 @@ async def next_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         current_day = 1
 
-    await _all_schedule_message(update, context)
+    await _all_schedule_message(update, context, current_day)
 
 
 async def previous_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global current_day
+    """
+        Switches to the previous day in all schedule
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
+    current_day = find_day(update, context)
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a schedule for the previous day.")
 
     if current_day != 1:
@@ -112,7 +144,7 @@ async def previous_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         current_day = 14
 
-    await _all_schedule_message(update, context)
+    await _all_schedule_message(update, context, current_day)
 
 
 async def _build_schedule_message(update: Update,
@@ -121,6 +153,17 @@ async def _build_schedule_message(update: Update,
                                   step_back: str,
                                   step_forward: str,
                                   callback: str):
+    """
+        Builds the messages with schedule for the defined day with extended keyboard
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself;
+        :param  day: day, for which the schedule is displayed;
+        :param  step_back: Callback data for back button;
+        :param  step_forward: Callback data for forward button;
+        :param  callback: Callback data for get links button.
+    """
+
     query = update.callback_query
     builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, day)
 
@@ -131,17 +174,65 @@ async def _build_schedule_message(update: Update,
                                                                                callback=callback))
 
 
-async def _week_schedule_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await _build_schedule_message(update, context, current_week_day, "previous_day", "next_day", "week_schedule_links")
+async def _week_schedule_message(update: Update, context: ContextTypes.DEFAULT_TYPE, day: int):
+    """
+        Collecting information for schedule builder for a week
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself;
+        :param day: day, for which the schedule is displayed.
+    """
+
+    await _build_schedule_message(update, context, day, "previous_day", "next_day", "week_schedule_links")
 
 
-async def _all_schedule_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await _build_schedule_message(update, context, current_day, "back", "forward", "all_schedule_links")
+async def _all_schedule_message(update: Update, context: ContextTypes.DEFAULT_TYPE, day: int):
+    """
+        Collecting information for schedule builder for both weeks
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself;
+        :param day: day, for which the schedule is displayed.
+    """
+
+    await _build_schedule_message(update, context, day, "back", "forward", "all_schedule_links")
 
 
 async def send_week_schedule_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await clear_markup(send_links)(update, context, current_week_day)
+    """
+        Sends links for week schedule
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
+    await clear_markup(send_links)(update, context, find_day(update, context))
 
 
 async def send_all_schedule_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await clear_markup(send_links)(update, context, current_day)
+    """
+        Sends links for all schedule
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
+    await clear_markup(send_links)(update, context, find_day(update, context))
+
+
+def find_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Looking for the right day
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
+    old_message = update.callback_query.message.text
+    old_day = old_message.splitlines()[0][11:-1]
+
+    for day in range(1, 15):
+        if old_day == day_name(day):
+            return day
+
+    return today_day()

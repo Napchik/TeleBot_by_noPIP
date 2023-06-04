@@ -2,7 +2,7 @@
     Description: Contains static phrases.
 
     Author: Ivan Maruzhenko
-    Version: 0.5
+    Version: 1.0
 """
 
 from dataclasses import dataclass
@@ -13,7 +13,7 @@ START: str = "Введіть, будь ласка, Вашу групу." \
              "\n\n/cancel - скасувати реєстрацію."
 
 RE_START: str = "Ви вже зареєстровані!" \
-                 "\n\nЯкщо Вам потрібно змінити якісь налаштування - зробіть це через <i>Налаштування ⚙</i>" \
+                "\n\nЯкщо Вам потрібно змінити якісь налаштування - зробіть це через <i>Налаштування ⚙</i>" \
                 "\n\nТакож, існує команда <b>/register</b>, що зможе Вам допомогти у окремих випадках."
 
 HELP: str = "Мої можливості:" \
@@ -38,7 +38,12 @@ MODERATOR_INFO: str = "<b>Вітаю! Ви успішно пройшли реє�
 
 @dataclass(slots=True, frozen=True)
 class Answers:
-    BACK: str = "Повернутися ↩️"
+    """
+        DataClass Answers
+
+        Contains static phrases.
+    """
+    BACK: str = "Повернутися ↩"
     GOT_IT: str = "Зрозуміло 👌"
     CANCEL: str = "Скасувати ❌"
 
@@ -77,11 +82,23 @@ class Answers:
 
 @dataclass(slots=True, frozen=True)
 class Results:
+    """
+        DataClass Results
+
+        Contains some static phrases for results on some actions.
+    """
     REG_NO: str = "Готово! Ви відмовилися від розсилки розкладу."
     REG_MORNING: str = "Вітаю! Ви підписалися на ранкову розсилку розкладу."
     REG_ALL: str = "Вітаю! Ви підписалися на повну розсилку розкладу."
 
 
 class RoutineChoice(NamedTuple):
+    """
+        Class RoutineChoice
+
+        Inherited from NamedTuple
+
+        Contains instances of the "Answers" and "Results" classes (used for quick access)
+    """
     Answers = Answers()
     Results = Results()

@@ -25,28 +25,28 @@ from loger_config import logger
 
 
 def check_group(group: str):
-    """Function which checks if group exists in database"""
+    """ Function which checks if group exists in database """
     filter = f"SELECT * FROM list_groups WHERE group_name = '{group}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return bool(result)
 
 
 def check_user(user_id: int):
-    """Function which checks if user exists in database"""
+    """ Function which checks if user exists in database """
     filter = f"SELECT * FROM users WHERE user_id = '{user_id}'"
     result = reformation_data.reformat_int(SQL.execute(filter))
     return bool(result)
 
 
 def check_user_role(user_id: int):
-    """Function which checks role of user in database"""
+    """ Function which checks role of user in database """
     filter = f"SELECT role FROM users WHERE user_id = '{user_id}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def transfer_role(user_id: int, new_user_id: int):
-    """Function which transfers role from 'moderator' to other user"""
+    """ Function which transfers role from 'moderator' to other user """
     filter = f"UPDATE users SET role = 'user' WHERE user_id = '{user_id}'"
     SQL.table_operate(filter)
     filter = f"UPDATE users SET role = 'moderator' WHERE user_id = '{new_user_id}'"
@@ -55,28 +55,28 @@ def transfer_role(user_id: int, new_user_id: int):
 
 
 def get_userid_by_nickname(user_nickname: str):
-    """Function which checks role of user in database"""
+    """ Function which checks role of user in database """
     filter = f"SELECT user_id FROM info_users WHERE user_nickname = '{user_nickname}'"
     result = reformation_data.reformat_int(SQL.execute(filter))
     return result
 
 
 def users_nickname_by_group(user_group: int):
-    """Function which checks role of user in database"""
+    """ Function which checks role of user in database """
     filter = f"SELECT user_nickname FROM info_users JOIN users ON info_users.user_id = users.user_id WHERE users.group_name = '{user_group}' AND users.role = 'user'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
 
 
 def count_moderators(group_name: str):
-    """Function which checks quantity of moderators in group and returns name on role chosen"""
+    """ Function which checks quantity of moderators in group and returns name on role chosen """
     filter = f"SELECT user_id FROM users WHERE role = 'moderator' AND group_name = '{group_name}'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return len(result)
 
 
 def choose_role(group_name: str):
-    """Function which checks quantity of moderators in group and returns name on role chosen"""
+    """ Function which checks quantity of moderators in group and returns name on role chosen """
     filter = f"SELECT user_id FROM users WHERE group_name = '{group_name}' AND role = 'moderator'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     if len(result) < 3:
@@ -86,16 +86,15 @@ def choose_role(group_name: str):
 
 
 def check_user_group(user_id: int):
-    """Function which returns name of group by user"""
+    """ Function which returns name of group by user """
     filter = f"SELECT group_name FROM users WHERE user_id = '{user_id}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def add_user(user_name: str, user_surname: str, user_nickname: str, user_id: int, user_group: str,
-             user_schedule: int,
-             user_role: str):
-    """Function which adds new user and new group in list of groups or updates data which already exists"""
+             user_schedule: int, user_role: str):
+    """ Function which adds new user and new group in list of groups or updates data which already exists """
     if check_user(user_id) is False:
         filter = f"INSERT INTO users ('user_id', 'group_name', 'schedule_switch', 'role') VALUES ('{user_id}', '{user_group}', '{user_schedule}','{user_role}')"
         SQL.table_operate(filter)
@@ -113,27 +112,27 @@ def add_user(user_name: str, user_surname: str, user_nickname: str, user_id: int
 
 
 def update_schedule_switch(user_id: int, schedule_switch: int):
-    """Function to change schedule_switch by user_id 0 -> no schedule  1 -> only morning 2 -> morning and evening"""
+    """ Function to change schedule_switch by user_id 0 -> no schedule  1 -> only morning 2 -> morning and evening """
     if check_user(user_id) is True:
         filter = f"UPDATE users SET schedule_switch = '{schedule_switch}' WHERE user_id = '{user_id}'"
         SQL.table_operate(filter)
 
 
 def change_group(user_id: int, group_name: str, role: str):
-    """Function to change user group"""
+    """ Function to change user group """
     if check_user(user_id) is True and check_user_group(user_id) != group_name:
         filter = f"UPDATE users SET group_name = '{group_name}', role = '{role}' WHERE user_id = '{user_id}'"
         SQL.table_operate(filter)
 
 
 def list_lessons(group: str):
-    """Function to execute list of lessons"""
+    """ Function to execute list of lessons """
     filter = f"SELECT subject FROM info_professor WHERE group_name = '{group}'"
     return reformation_data.reformat_list(SQL.execute(filter))
 
 
 def add_new_group(group: str):
-    """Function to add new group in list of groups"""
+    """ Function to add new group in list of groups """
     filter = f"INSERT INTO list_groups ('group_name') VALUES ('{group}')"
     SQL.table_operate(filter)
     parser = parsing.Parser()
@@ -145,20 +144,20 @@ def add_new_group(group: str):
 
 
 def delete_group(group: str):
-    """Function to delete groups which not existed in list of groups"""
+    """ Function to delete groups which not existed in list of groups """
     filter = f"DELETE FROM list_groups WHERE group_name = '{group}'"
     SQL.table_operate(filter)
     db_function.add_log(f"Group {group} deleted.")
 
 
 def change_is_blocked(user_id: int):
-    """Function to change user attribute 'is_blocked' to identify inactive users"""
+    """ Function to change user attribute 'is_blocked' to identify inactive users """
     filter = f"UPDATE users SET is_blocked = 1 WHERE user_id = '{user_id}'"
     SQL.table_operate(filter)
 
 
 def deleting_blocked_user():
-    """Function to delete inactive users"""
+    """ Function to delete inactive users """
     filter = "SELECT user_id FROM users WHERE is_blocked = 1"
     list_user_id = reformation_data.reformat_list(SQL.execute(filter))
     for user_id in list_user_id:

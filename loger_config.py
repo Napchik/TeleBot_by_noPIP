@@ -2,7 +2,7 @@
     Description: Configure logging.
 
     Author: Ivan Maruzhenko
-    Version: 0.5
+    Version: 1.0
 """
 import logging
 logging.basicConfig(

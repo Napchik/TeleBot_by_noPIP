@@ -9,4 +9,4 @@ Telegram bot by students of KPI FICT 2 course.
 
 [GitHub](https://github.com/Napchik/TeleBot_by_noPIP)
 
-Version 0.1
+Version 1.0 (release)

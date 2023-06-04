@@ -1,8 +1,8 @@
 """
-    Description: Represents day timetable.
+    Description: Builds messages using pattern builder.
 
     Author: Ivan Maruzhenko
-    Version: 0.8
+    Version: 1.0
 """
 
 from Services.lessons import Lessons
@@ -11,14 +11,28 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 class ScheduleBuilder:
-    """Class day represents the daily schedule"""
+    """
+        Class ScheduleBuilder
+
+        Takes instance of lesson class and using it`s parameters to build messages.
+    """
 
     def __init__(self, user_id, day: int):
+        """
+            Contains starting and processed values
+
+            :param user_id: user id, used to define the user group;
+            :param day: day, for which the schedule is displayed.
+        """
         self.__group = check_user_group(user_id)
         self.__lessons = Lessons(self.__group, day)
 
     def build_text(self, title: str = "") -> str:
-        """Builds the message with daily schedule"""
+        """
+            Builds the message with daily schedule
+
+            :param title: title of the message (usually name of week day). Default value - "".
+        """
 
         if title != "":
             title = title + "\n\n"
@@ -45,11 +59,9 @@ class ScheduleBuilder:
 
     def build_keyboard(self, callback: str) -> InlineKeyboardMarkup:
         """
-        Builds the keyboard with links to lessons.
+            Builds the keyboard with links to lessons.
 
-        Arguments:
-            callback - Callback data for get links button.
-
+            :param callback: - Callback data for get links button.
         """
 
         keyboard = self._build_special_markup(callback)
@@ -58,13 +70,11 @@ class ScheduleBuilder:
 
     def build_extended_keyboard(self, step_back: str, step_forward: str, callback: str) -> InlineKeyboardMarkup:
         """
-        Builds the extended keyboard with links to lessons and navigation buttons.
+            Builds the extended keyboard with links to lessons and navigation buttons.
 
-        Arguments:
-            step_back - Callback data for back button ;
-            step_forward - Callback data for forward button ;
-            callback - Callback data for get links button.
-
+            :param step_back: Callback data for back button;
+            :param step_forward: Callback data for forward button;
+            :param callback: Callback data for get links button.
         """
 
         extended_keyboard = self._build_special_markup(callback)
@@ -75,7 +85,7 @@ class ScheduleBuilder:
         return InlineKeyboardMarkup(extended_keyboard)
 
     def _build_markup(self):
-        """Builds the array with links to lessons"""
+        """ Builds the array with links to lessons """
 
         markup: list[[InlineKeyboardButton]] = []
 
@@ -89,10 +99,9 @@ class ScheduleBuilder:
 
     def _build_special_markup(self, callback: str):
         """
-        Builds buttons for lessons with more than one link.
+            Builds buttons for lessons with more than one link
 
-        Arguments:
-            callback - Callback data for get links button.
+            :param callback: Callback data for get links button.
 
         """
 
@@ -107,7 +116,11 @@ class ScheduleBuilder:
         return markup
 
     def build_link_list(self, lesson_number: int):
-        """Builds message with links for lessons with more than one link"""
+        """
+            Builds message with links for lessons with more than one link
+
+            :param lesson_number: lesson number in day timetable.
+        """
 
         text: str = ""
         lesson = self.__lessons.get_lesson(lesson_number)
