@@ -6,8 +6,8 @@
 """
 
 
-def reformat_int(data: list) -> int:
-    """Function to convert executed data to int"""
+def reformat_int(data: list) -> int | None:
+    """ Function to convert executed data to int """
     if str(data) == "[]":
         return None
     else:
@@ -15,15 +15,15 @@ def reformat_int(data: list) -> int:
 
 
 def reformat_list(data: list) -> list:
-    """Function to convert executed data to list"""
+    """ Function to convert executed data to list """
     result = []
     for i in data:
         result.append(i[0])
     return result
 
 
-def reformat_list_3(data: list) -> list:
-    """Function to convert executed data to list"""
+def reformat_list_3(data: list) -> [list, list]:
+    """ Function to convert executed data to list """
     result1 = []
     result2 = []
     result3 = []
@@ -35,7 +35,7 @@ def reformat_list_3(data: list) -> list:
 
 
 def reformat_str(data: list) -> str:
-    """Function to convert executed data to str"""
+    """ Function to convert executed data to str """
     result = ""
     if str(data) == "[]":
         return result

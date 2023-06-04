@@ -2,7 +2,7 @@
     Description: Contains logic of registration conversation.
 
     Author: Ivan Maruzhenko
-    Version: 0.2
+    Version: 1.0
 """
 
 from telegram.constants import ParseMode
@@ -11,10 +11,26 @@ from Services.messages import START, REGISTRATION_INFO, MODERATOR_INFO, RoutineC
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, ConversationHandler
 from Database.db_function_user import choose_role, add_user
+from Services.conversation_states import (
+    GROUP,
+    ROUTINE,
+    REG_INFO,
+    REG_EXIT
+)
 
 
 class UserData:
+    """
+        Class UserData
+
+        Class contains the information about the user, that was collected during the registration process
+    """
     def __init__(self, user_id):
+        """
+            Initialization method
+
+            :param user_id: id of the user
+        """
         self.user_id: int = user_id
         self.name: str | None = None
         self.surname: str | None = None
@@ -24,17 +40,22 @@ class UserData:
         self.role: str | None = None
 
     def send_data(self):
+        """ Method for sending information about the user to the Database """
         add_user(self.name, self.surname, self.username, self.user_id, self.group, self.schedule_mode, self.role)
 
 
-GROUP, ROUTINE, REG_INFO, REG_EXIT = map(chr, range(4))
 answers = RoutineChoice.Answers
 results = RoutineChoice.Results
 users_dictionary: dict[int: UserData] = {}
 
 
 async def start_reg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    """Displays the first welcome message for the user"""
+    """
+        Displays the first welcome message for the user
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
     user = update.message.from_user
     global users_dictionary
 
@@ -54,7 +75,13 @@ async def start_reg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def group(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Prompts the user for their group"""
+    """
+        Prompts the user for their group
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     global users_dictionary
     group_name: str = update.message.text.upper()
@@ -78,7 +105,14 @@ async def group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ROUTINE
 
 
-async def routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def set_routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """
+        Prompts the user to select a routine
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     answer = update.message.text
     global users_dictionary
@@ -105,6 +139,14 @@ async def routine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Displays a message to the user about successful registration;
+        Sends the data collected about the user to the database.
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     global users_dictionary
     user_data = users_dictionary[user.id]
@@ -135,6 +177,13 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def misunderstand(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Displays a message to the user warning of invalid input
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     logger.info(f"User: {user.username}, user_id: {user.id}. Invalid input: {update.message.text}")
 
@@ -143,6 +192,14 @@ async def misunderstand(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Allows the user to cancel the registration process;
+        In this case, all information collected about the user during the registration process will be deleted.
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     global users_dictionary
 

@@ -22,14 +22,15 @@ from Database.db_function_user import (
     count_moderators
 )
 
-answers = RoutineChoice.Answers
-(
+from Services.conversation_states import (
     CONTROLS_CHOOSE_LESSON,
     CONTROLS_UPDATE_LINK,
     CHECK_CORRECT,
     CONTROLS_CHOOSE_USER,
     CHECK_ROLE_CORRECT
-) = map(chr, range(25, 30))
+)
+
+answers = RoutineChoice.Answers
 
 chosen_lesson = int()
 chosen_user = int()

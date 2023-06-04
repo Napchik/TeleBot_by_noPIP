@@ -86,7 +86,7 @@ class Parser:
         time.sleep(0.5)
         self._response_handler(url=url, method=method)
 
-    def _payload_creator(self, group: str) -> dict:
+    def _payload_creator(self, group: str):
         """
             Created data for post request
             Needs for at least one response from KPI schedule site
@@ -109,7 +109,7 @@ class Parser:
         for elem in temp_array:
             self.payload[f"{elem[0]}"] = elem[1]
 
-    def _trans_data(self) -> dict:
+    def _trans_data(self) -> list:
         """
             Since main parser function goes row by row, the output data will have first classes, then second and so on.
             For DB, it's better to reverse parsed data to be first Monday, then Tuesday and so on.
@@ -123,17 +123,17 @@ class Parser:
 
         return output_data
 
-    def _parser(self, param: str):
+    def _parser(self, parameter: str):
         """
             Function that parses response with schedule in it
 
-            :param param: needed to select each table separately
+            :param parameter: needed to select each table separately
         """
         self.soup = BeautifulSoup(self.response.text, "html.parser")
         self.data.clear()
         temp_data = []
 
-        for items in self.soup.select(f"{param}"):
+        for items in self.soup.select(f"{parameter}"):
             temp_data.append(items.select("td"))
         temp_data.pop(0)
 
@@ -177,9 +177,9 @@ class Parser:
         self.last_url = "http://epi.kpi.ua" + self.response.headers["Location"]
         self._response_handler(url=self.last_url, method="get")
 
-        self._parser(param="table#ctl00_MainContent_FirstScheduleTable tr")
+        self._parser(parameter="table#ctl00_MainContent_FirstScheduleTable tr")
         self.parsed_data["week1"] = self._trans_data()
-        self._parser(param="table#ctl00_MainContent_SecondScheduleTable tr")
+        self._parser(parameter="table#ctl00_MainContent_SecondScheduleTable tr")
         self.parsed_data["week2"] = self._trans_data()
 
         logger.info(f"Group '{group}' has been parsed successful")

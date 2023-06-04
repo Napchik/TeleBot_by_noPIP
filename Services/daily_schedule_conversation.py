@@ -2,18 +2,20 @@
     Description: Contains logic of daily schedule conversation.
 
     Author: Ivan Maruzhenko
-    Version: 0.1
+    Version: 1.0
 """
 
+import re
+from Database.db_function import today_day, tomorrow_day
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 from Services.schedule_builder import ScheduleBuilder
-from Database.db_function import today_day
 from loger_config import logger
-import re
-
-TODAY_SCHEDULE, TOMORROW_SCHEDULE = map(chr, range(10, 12))
+from Services.conversation_states import (
+    TODAY_SCHEDULE,
+    TOMORROW_SCHEDULE
+)
 
 
 def clear_markup(func):
@@ -30,43 +32,63 @@ def clear_markup(func):
 
 
 async def today(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Sends a message with lessons for today"""
+    """
+        Sends a message with lessons for today
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested the schedule for today.")
 
-    await _schedule_for_the_day(update, context, 3, "СЬОГОДНІ", "today_links")
+    await _schedule_for_the_day(update, context, today_day(), "СЬОГОДНІ", "today_links")
 
     return TODAY_SCHEDULE
 
 
 async def today_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Sends message with special links for today's lessons with more than one link"""
+    """
+        Sends message with special links for today's lessons with more than one link
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested special links for today.")
 
-    await clear_markup(send_links)(update, context, 3)
+    await clear_markup(send_links)(update, context, today_day())
 
 
 async def tomorrow(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Sends a message with lessons for tomorrow"""
+    """
+        Sends a message with lessons for tomorrow
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested the schedule for tomorrow.")
 
-    await _schedule_for_the_day(update, context, 9, "ЗАВТРА", "tomorrow_links")
+    await _schedule_for_the_day(update, context, tomorrow_day(), "ЗАВТРА", "tomorrow_links")
 
     return TOMORROW_SCHEDULE
 
 
 async def tomorrow_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Sends message with special links for tomorrow's lessons with more than one link"""
+    """
+        Sends message with special links for tomorrow's lessons with more than one link
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested special links for tomorrow.")
 
-    await clear_markup(send_links)(update, context, 9)
+    await clear_markup(send_links)(update, context, tomorrow_day())
 
 
 async def _schedule_for_the_day(
@@ -77,13 +99,13 @@ async def _schedule_for_the_day(
         callback: str
 ):
     """
-    Sends a message with lessons for the selected day.
+        Sends a message with lessons for the selected day.
 
-    Arguments:
-            day - day whose schedule is to be displayed ;
-            title - title of the message ;
-            callback - Callback data for get links button.
-
+        :param day: day whose schedule is to be displayed;
+        :param title: title of the message;
+        :param callback: callback data for get links button;
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
     """
 
     builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, day)
@@ -95,7 +117,13 @@ async def _schedule_for_the_day(
 
 
 async def send_links(update: Update, context: ContextTypes.DEFAULT_TYPE, day: int):
-    """Sends message with links for lessons with more than one link"""
+    """
+        Sends message with links for lessons with more than one link
+
+        :param day: day whose schedule is to be displayed;
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
     lesson_number = int(re.search(r"\d+", update.callback_query.data).group())
     builder: ScheduleBuilder = ScheduleBuilder(update.effective_chat.id, day)
     await context.bot.send_message(chat_id=update.effective_chat.id,

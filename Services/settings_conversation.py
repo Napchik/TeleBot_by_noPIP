@@ -2,28 +2,41 @@
     Description: Settings conversation handlers.
 
     Author: Ivan Skorobagatko
-    Version: 0.1.1
+    Version: 1.0
 """
 
 import os
 
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
-from loger_config import logger
-from Database.db_function import add_log
-from Database.db_function_user import update_schedule_switch, change_group, add_new_group, check_group, choose_role, \
-    check_user_group
 from telegram.constants import ParseMode
+from loger_config import logger
 from Services.messages import RoutineChoice
+from Database.db_function import add_log
+from Database.db_function_user import (
+    update_schedule_switch,
+    change_group,
+    add_new_group,
+    check_group,
+    choose_role,
+    check_user_group
+)
+from Services.conversation_states import (
+    CHANGE_TIME,
+    CHANGE_GROUP,
+    SEND_BUG
+)
 
 answers = RoutineChoice.Answers
-CHANGE_TIME = chr(10)
-CHANGE_GROUP = chr(11)
-SEND_BUG = chr(12)
 
 
 async def switch_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Switch Schedule Mode (0, 1, 2)"""
+    """
+       Switch Schedule Mode (0, 1, 2)
+
+       :param update: an object that contains all the information and data that are coming from telegram itself;
+       :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a schedule mode change.")
@@ -41,7 +54,12 @@ async def switch_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def switch_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Switch Group Mode"""
+    """
+        Switch Group Mode
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a group change.")
@@ -59,7 +77,12 @@ async def switch_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def update_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Update DB Schedule Mode for User"""
+    """
+        Update DB Schedule Mode for User
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user updates a schedule mode.")
@@ -89,7 +112,12 @@ async def update_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def update_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Update DB Group for User"""
+    """
+        Update DB Group for User
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user updates a group.")
@@ -109,9 +137,13 @@ async def update_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-
 async def cancel_change(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Cancel Group Change for User"""
+    """
+        Cancel Group Change for User
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user canceled change.")
@@ -122,7 +154,12 @@ async def cancel_change(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def report_bug(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Report Bug"""
+    """
+        Report Bug
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
@@ -134,11 +171,17 @@ async def report_bug(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def send_bug_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send Bug"""
+    """
+        Send Bug
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     user = update.effective_user
 
-    text = update.message.text
+    text = f"Користувач {user.username} повідомляє про промилку:\n\n"
+    text += update.message.text
     logger.info(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")
 
     add_log(f"User: {user.username}, user_id: {user.id}. The user reports a bug.")

@@ -11,7 +11,7 @@ from loger_config import logger
 
 
 def connector_base_cursor():
-    """Makes connection to Database "Bot" """
+    """ Makes connection to Database "Bot" """
     try:
         folder = os.path.abspath(os.curdir).split("\\")
         if "Database" in folder or "Handlers" in folder or "Services" in folder:
@@ -27,7 +27,7 @@ def connector_base_cursor():
 
 
 def execute(filter) -> list:
-    """Makes request to Database and returns values (list) using special 'filter' """
+    """ Makes request to Database and returns values (list) using special 'filter' """
     try:
         conn, cursor = connector_base_cursor()
         cursor.execute(f"{filter}")  # Can be used to SELECT Values
@@ -39,7 +39,7 @@ def execute(filter) -> list:
 
 
 def table_operate(filter):
-    """Makes request to Database and changes it in a proper way using 'filter' """
+    """ Makes request to Database and changes it in a proper way using 'filter' """
     try:
         conn, cursor = connector_base_cursor()
         cursor.execute(f"{filter}")  # Can be used to DELETE, INSERT, UPDATE Values
@@ -50,7 +50,7 @@ def table_operate(filter):
 
 
 def exist_test_insert(filter, action1, action2):
-    """Allows us to avoid problems with Database with fields that are UNIQUE """
+    """ Allows us to avoid problems with Database with fields that are UNIQUE """
     data = execute(f"{filter}")  # Checking for existing such Data is Database
     if bool(data) is False:
         try:

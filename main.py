@@ -5,7 +5,7 @@
              Ivan Skorobagatko
              Ivan Maruzhenko
              Evhen Miholat
-    Version: 0.1
+    Version: 1.0
 """
 
 from app import app

@@ -25,14 +25,14 @@ from loger_config import logger
 
 
 def add_log(log: str):
-    """Function to add logs into database"""
+    """ Function to add logs into database """
     filter = f"INSERT INTO log (time, info) VALUES ('{datetime.now()}', '{log}')"
     SQL.table_operate(filter)
     logger.info("Log has been inserted into database")
 
 
 def today_day() -> int:
-    """Function to find out number of week and what day is today"""
+    """ Function to find out number of week and what day is today """
     filter = f"SELECT week FROM info_global"
     if SQL.execute(filter) == 1:
         result = datetime.today().isoweekday()
@@ -41,15 +41,22 @@ def today_day() -> int:
     return result
 
 
+def tomorrow_day() -> int:
+    """ Function to find out number of day is tomorrow """
+    if today_day() == 14:
+        return 1
+    return today_day() + 1
+
+
 def get_week() -> int:
-    """Function to find out number of week 1 -> week1 2 -> week2"""
+    """ Function to find out number of week 1 -> week1 2 -> week2 """
     filter = f"SELECT week FROM info_global"
     result = reformation_data.reformat_int(SQL.execute(filter))
     return result
 
 
 def change_week():
-    """Function to change week on Mondays"""
+    """ Function to change week on Mondays """
     if datetime.today().isoweekday() == 1:
         week = get_week()
         if week == 1:
@@ -62,21 +69,21 @@ def change_week():
 
 
 def users_by_group(group: str) -> list:
-    """Function to execute all user_id by group"""
+    """ Function to execute all user_id by group """
     filter = f"SELECT user_id FROM users WHERE group_name = '{group}'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
 
 
 def all_groups() -> list:
-    """Function to execute list of all groups from Database"""
+    """ Function to execute list of all groups from Database """
     filter = f"SELECT group_name FROM list_groups"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
 
 
 def schedule_day_by_group(group: str, day: int) -> str:
-    """Function to execute schedule for special day"""
+    """ Function to execute schedule for special day """
     if day == 7 or day == 14:
         return ''
     filter = f"SELECT day{day} FROM schedule WHERE group_name = '{group}'"
@@ -85,42 +92,42 @@ def schedule_day_by_group(group: str, day: int) -> str:
 
 
 def professor_by_subject(group: str, subject: str) -> str:
-    """Function to execute name of professor by subject name"""
+    """ Function to execute name of professor by subject name """
     filter = f"SELECT name FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def link_by_subject(group: str, subject: str):
-    """Function to execute link for subject by subject name"""
+    """ Function to execute link for subject by subject name """
     filter = f"SELECT link FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def update_link_by_subject(group: str, subject: str, new_link: str):
-    """Function to update link by group and subject name"""
+    """ Function to update link by group and subject name """
     filter = f"UPDATE info_professor SET link = '{new_link}' WHERE group_name='{group}' AND subject = '{subject}'"
     SQL.table_operate(filter)
     add_log(f"{group}: Link changed successfully")
 
 
 def time_by_number(number: int):
-    """Function to execute time of lesson given"""
+    """ Function to execute time of lesson given """
     filter = f"SELECT time_lesson{number} FROM info_global"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def day_name(day: int):
-    """Function to execute name of day by day number"""
+    """ Function to execute name of day by day number """
     filter = f"SELECT day{day} FROM info_global"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def inserter_schedule(week: str, group: str, data: dict):
-    """Function inserts or updates schedule for a group"""
+    """ Function inserts or updates schedule for a group """
     if week == "week1":
         counter = 1
     else:
@@ -142,7 +149,7 @@ def inserter_schedule(week: str, group: str, data: dict):
 
 
 def inserter_professor(week: str, group: str, data: dict):
-    """Function inserts or updates professors for a group"""
+    """ Function inserts or updates professors for a group """
     for days in data[f"{week}"]:
         for lessons_professors in days:
             if lessons_professors is not None:

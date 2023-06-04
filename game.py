@@ -1,8 +1,8 @@
 """
-    Description: Game logics. (BETA! EDIT IN FUTURE)
+    Description: Game logics.
 
     Author: Evhen Miholat
-    Version: 0.2
+    Version: 0.5
 """
 
 from asyncio import sleep
@@ -10,15 +10,24 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
 from telegram.constants import ParseMode
 from loger_config import logger
-from Database.db_function_game import (
-    user_check, update_score_by_user, add_new_gamer, update_games_by_user,
-    score_by_gamer, games_by_gamer, top_gamers, name_by_gamer, change_name_gamer
-)
 from Services.messages import RoutineChoice
+from Database.db_function_game import (
+    user_check,
+    update_score_by_user,
+    add_new_gamer,
+    update_games_by_user,
+    score_by_gamer,
+    games_by_gamer,
+    top_gamers,
+    name_by_gamer,
+    change_name_gamer
+)
+from Services.conversation_states import (
+    ADD_PLAYER,
+    CHANGE_NAME,
+    DICE
+)
 
-ADD_PLAYER = chr(13)
-CHANGE_NAME = chr(14)
-DICE = chr(15)
 answers = RoutineChoice.Answers
 
 
@@ -33,7 +42,7 @@ async def game_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(text=f"Привіт {name_by_gamer(user.id)}, граємо?", reply_markup=reply_markup)
         return DICE
 
-    await context.bot.send_message(chat_id=user.id, text="Привіт, бачу, ви тут вперше. Як вас звати?")
+    await context.bot.send_message(chat_id=user.id, text="Привіт, бачу, ви тут вперше. Як Вас звати?")
     return ADD_PLAYER
 
 
@@ -73,13 +82,14 @@ async def update_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def dice_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Main Game (DICE)"""
-    user = update.effective_user
-    logger.info(f"User: {user.username}, user_id: {user.id}. The user has started the game of dice.")
 
     async def roll_dice(chat_id, message) -> int:
         await context.bot.send_message(chat_id=chat_id, text=message)
         data = await context.bot.send_dice(chat_id=chat_id)
         return data["dice"]["value"]
+
+    user = update.effective_user
+    logger.info(f"User: {user.username}, user_id: {user.id}. The user has started the game of dice.")
 
     data_user = await roll_dice(update.effective_chat.id, 'Ви 👨 підкидаєте кубик')
     await sleep(5)
