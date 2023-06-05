@@ -2,7 +2,7 @@
     Description: Reformatting received data to some types.
 
     Author: Mikhail Shikalovskyi
-    Version: 1.2
+    Version: 1.0 (release)
 """
 
 

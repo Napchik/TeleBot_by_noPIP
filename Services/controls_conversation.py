@@ -38,7 +38,13 @@ chosen_link = str()
 
 
 async def choose_lesson_from_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """S"""
+    """
+        Function to choose lesson for link change
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     current_lesson_id = 0
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a change lesson link.")
@@ -60,6 +66,13 @@ async def choose_lesson_from_list(update: Update, context: ContextTypes.DEFAULT_
 
 
 async def put_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Function to input link for a lesson
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     global chosen_lesson
 
     chosen_lesson = int(update.message.text)
@@ -78,6 +91,13 @@ async def put_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def check_update_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Function to confirm link change
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     global chosen_lesson
     global chosen_link
 
@@ -96,6 +116,13 @@ async def check_update_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def update_link_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Function to update link
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     global chosen_lesson
     global chosen_link
     query = update.callback_query
@@ -108,7 +135,13 @@ async def update_link_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def choose_user_from_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """S"""
+    """
+        Function to choose user for role transfer
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     current_user = 0
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a change lesson link.")
@@ -130,6 +163,13 @@ async def choose_user_from_list(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def check_update_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Function to confirm role transfer
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     global chosen_user
     chosen_user = int(update.message.text)
     user = update.effective_user
@@ -150,6 +190,12 @@ async def check_update_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def update_role_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        Function to transfer role
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
     global chosen_user
     user = update.effective_user
     moderators = count_moderators(check_user_group(user.id))

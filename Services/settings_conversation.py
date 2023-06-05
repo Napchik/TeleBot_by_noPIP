@@ -47,7 +47,7 @@ async def switch_schedule_mode(update: Update, context: ContextTypes.DEFAULT_TYP
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
 
-    await context.bot.send_message(chat_id=user.id, text="<b>Виберіть бажаний час</b>", reply_markup=reply_markup,
+    await context.bot.send_message(chat_id=user.id, text="<b>Виберіть бажаний час з переліку нижче</b>", reply_markup=reply_markup,
                                    parse_mode=ParseMode.HTML)
 
     return CHANGE_TIME
@@ -64,8 +64,9 @@ async def switch_group_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested a group change.")
 
-    text = """<b>
-    Введіть, будь ласка, назву групи.
+    text = f"""<b>
+    Ваша поточна група: {check_user_group(user.id)}
+    \nВведіть, будь ласка, назву нової групи.
     \n(ХХ-ХХ).</b>
     """
 

@@ -6,7 +6,14 @@
 """
 
 from asyncio import sleep
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import (
+    Update,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    ReplyKeyboardRemove,
+    ReplyKeyboardMarkup,
+    KeyboardButton
+)
 from telegram.ext import ContextTypes, ConversationHandler
 from telegram.constants import ParseMode
 from loger_config import logger
@@ -20,7 +27,9 @@ from Database.db_function_game import (
     games_by_gamer,
     top_gamers,
     name_by_gamer,
-    change_name_gamer
+    change_name_gamer,
+    get_daily,
+    change_daily
 )
 from Services.conversation_states import (
     ADD_PLAYER,
@@ -32,12 +41,30 @@ answers = RoutineChoice.Answers
 
 
 async def game_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Entry Point for Game"""
+    """
+        Entry Point for Game
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started game.")
+
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.GAME_THROW),
+                                         KeyboardButton(text=answers.GAME_TOP)],
+
+                                        [KeyboardButton(text=answers.GAME_CHANGE),
+                                         KeyboardButton(text=answers.BACK)]],
+                                       one_time_keyboard=True,
+                                       resize_keyboard=True)
+    if get_daily(user.id) == 1:
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text=f'Ви вже грали сьогодні', reply_markup=reply_markup)
+        return ConversationHandler.END
+
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text=answers.GAME_START, callback_data="game_start"),
                                           InlineKeyboardButton(text=answers.GAME_STOP, callback_data="game_stop")]])
-
     if user_check(user.id):
         await update.message.reply_text(text=f"Привіт {name_by_gamer(user.id)}, граємо?", reply_markup=reply_markup)
         return DICE
@@ -47,7 +74,13 @@ async def game_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def add_player(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Add Player to Database"""
+    """
+        Add Player to Database
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user_name = update.message.text
     user = update.message.from_user
     add_new_gamer(update.effective_user.id, user_name)
@@ -63,7 +96,13 @@ async def add_player(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def change_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Changing player name"""
+    """
+        Changing player name
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     if not user_check(user.id):
         await context.bot.send_message(chat_id=user.id, text="Спочатку пройдіть реестрацію!\nВведіть своє ім'я.")
@@ -73,7 +112,13 @@ async def change_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def update_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Triggers function to update database"""
+    """
+        Triggers function to update database
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     new_user_name = update.message.text
     user = update.message.from_user
     change_name_gamer(user.id, new_user_name)
@@ -81,21 +126,35 @@ async def update_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def dice_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Main Game (DICE)"""
+    """
+        Main Game (DICE)
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
 
     async def roll_dice(chat_id, message) -> int:
-        await context.bot.send_message(chat_id=chat_id, text=message)
+        await context.bot.send_message(chat_id=chat_id, text=message, reply_markup=ReplyKeyboardRemove())
         data = await context.bot.send_dice(chat_id=chat_id)
         return data["dice"]["value"]
 
     user = update.effective_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has started the game of dice.")
+    await update.callback_query.message.delete()
+
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.GAME_THROW),
+                                         KeyboardButton(text=answers.GAME_TOP)],
+
+                                        [KeyboardButton(text=answers.GAME_CHANGE),
+                                         KeyboardButton(text=answers.BACK)]],
+                                       one_time_keyboard=True,
+                                       resize_keyboard=True)
 
     data_user = await roll_dice(update.effective_chat.id, 'Ви 👨 підкидаєте кубик')
-    await sleep(5)
+    # await sleep(5)
 
     data_bot = await roll_dice(update.effective_chat.id, 'Бот 🤖 підкидає кубик')
-    await sleep(5)
+    # await sleep(5)
 
     if data_bot > data_user:
         await context.bot.send_message(chat_id=update.effective_chat.id, text='Бот виграв 🌧')
@@ -110,19 +169,22 @@ async def dice_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     update_games_by_user(update.effective_user.id, games_by_gamer(update.effective_user.id) + 1)
     games = games_by_gamer(update.effective_user.id)
+    change_daily(user.id)
+
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text=f'Кількість виграшів: {score_by_gamer(update.effective_user.id)} 🥇\n'
-                                        f'Кількість спроб: {games} 🧩')
-
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text=answers.GAME_START, callback_data="game_start"),
-                                          InlineKeyboardButton(text=answers.GAME_STOP, callback_data="game_stop")]])
-
-    await context.bot.send_message(chat_id=update.effective_chat.id, text='Граємо ще раз?', reply_markup=reply_markup)
-    return DICE
+                                        f'Кількість спроб: {games} 🧩', reply_markup=reply_markup)
+    return ConversationHandler.END
 
 
 async def top_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Top 10 Players in Database"""
+    """
+        Top 10 Players in Database
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.message.from_user
     logger.info(f"User: {user.username}, user_id: {user.id}. The user requested list of top players.")
     top_list = top_gamers()
@@ -137,9 +199,22 @@ async def top_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """End Game"""
+    """
+        End Game
+
+        :param update: an object that contains all the information and data that are coming from telegram itself;
+        :param context: an object that contains information and data about the status of the library itself.
+    """
+
     user = update.effective_user
-    query = update.callback_query
+    await update.callback_query.message.delete()
     logger.info(f"User: {user.username}, user_id: {user.id}. The user has ended the game.")
-    await query.edit_message_text(text="До наступної гри!")
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(text=answers.GAME_THROW),
+                                         KeyboardButton(text=answers.GAME_TOP)],
+
+                                        [KeyboardButton(text=answers.GAME_CHANGE),
+                                         KeyboardButton(text=answers.BACK)]],
+                                       one_time_keyboard=True,
+                                       resize_keyboard=True)
+    await context.bot.send_message(text="До наступної гри!", reply_markup=reply_markup)
     return ConversationHandler.END

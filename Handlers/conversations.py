@@ -221,8 +221,6 @@ SWITCH_TIME_CONVERSATION = ConversationHandler(
 
     allow_reentry=True,
 
-    conversation_timeout=60,
-
     states={
         CHANGE_TIME: [
             MessageHandler(filters.Regex(f"({answers.SETTINGS_NO})|"
@@ -251,8 +249,6 @@ SWITCH_GROUP_CONVERSATION = ConversationHandler(
 
     allow_reentry=True,
 
-    conversation_timeout=60,
-
     states={
         CHANGE_GROUP: [
             MessageHandler(filters.Regex(pattern_ua), update_group_mode)
@@ -279,8 +275,6 @@ REPORT_BUG_CONVERSATION = ConversationHandler(
 
     allow_reentry=True,
 
-    conversation_timeout=60,
-
     states={
         SEND_BUG: [
             MessageHandler(filters.TEXT, send_bug_message)
@@ -306,8 +300,6 @@ GAME_CONVERSATION = ConversationHandler(
     entry_points=[MessageHandler(filters.Regex(answers.GAME_THROW), game_start)],
 
     allow_reentry=True,
-
-    conversation_timeout=30,
 
     states={
         DICE: [
@@ -342,8 +334,6 @@ GAME_CHANGE_NAME_CONVERSATION = ConversationHandler(
 
     allow_reentry=True,
 
-    conversation_timeout=30,
-
     states={
         ADD_PLAYER: [
             MessageHandler(filters.TEXT, add_player)
@@ -374,8 +364,6 @@ CONTROLS_LINK_CONVERSATION = ConversationHandler(
     entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_LINKS), choose_lesson_from_list)],
 
     allow_reentry=True,
-
-    conversation_timeout=60,
 
     states={
         CONTROLS_CHOOSE_LESSON: [
@@ -411,8 +399,6 @@ CONTROLS_ROLE_CONVERSATION = ConversationHandler(
     entry_points=[MessageHandler(filters.Regex(answers.CONTROLS_ROLE), choose_user_from_list)],
 
     allow_reentry=True,
-
-    conversation_timeout=60,
 
     states={
         CONTROLS_CHOOSE_USER: [

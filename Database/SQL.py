@@ -3,7 +3,7 @@
                  are used to operate with SQL Database.
 
     Author: Mikhail Shikalovskyi
-    Version: 2.0
+    Version: 1.0 (release)
 """
 import sqlite3
 import os

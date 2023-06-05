@@ -16,7 +16,7 @@
 
 
     Author: Mikhail Shikalovskyi
-    Version: 1.5
+    Version: 1.0 (release)
 """
 import Database.reformattion_data as reformation_data
 import Database.SQL as SQL
@@ -25,7 +25,11 @@ from loger_config import logger
 
 
 def add_log(log: str):
-    """ Function to add logs into database """
+    """
+        Function to add logs into database
+
+        :param log: text of log which must be inserted into table
+    """
     filter = f"INSERT INTO log (time, info) VALUES ('{datetime.now()}', '{log}')"
     SQL.table_operate(filter)
     logger.info("Log has been inserted into database")
@@ -69,7 +73,10 @@ def change_week():
 
 
 def users_by_group(group: str) -> list:
-    """ Function to execute all user_id by group """
+    """ Function to execute all user_id by group
+
+        :param group: group name of user used in filter
+    """
     filter = f"SELECT user_id FROM users WHERE group_name = '{group}'"
     result = reformation_data.reformat_list(SQL.execute(filter))
     return result
@@ -83,7 +90,12 @@ def all_groups() -> list:
 
 
 def schedule_day_by_group(group: str, day: int) -> str:
-    """ Function to execute schedule for special day """
+    """
+        Function to execute schedule for special day
+
+        :param group: group name of user used in filter
+        :param day: number of day for which schedule must be got
+    """
     if day == 7 or day == 14:
         return ''
     filter = f"SELECT day{day} FROM schedule WHERE group_name = '{group}'"
@@ -92,42 +104,72 @@ def schedule_day_by_group(group: str, day: int) -> str:
 
 
 def professor_by_subject(group: str, subject: str) -> str:
-    """ Function to execute name of professor by subject name """
+    """
+        Function to execute name of professor by subject name
+
+        :param group: group name of user used in filter
+        :param subject: name of lesson for which professor must be got
+    """
     filter = f"SELECT name FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def link_by_subject(group: str, subject: str):
-    """ Function to execute link for subject by subject name """
+    """
+        Function to execute link for subject by subject name
+
+        :param group: group name of user used in filter
+        :param subject: name of lesson for which link must be got
+    """
     filter = f"SELECT link FROM info_professor WHERE group_name='{group}' AND subject = '{subject}'"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def update_link_by_subject(group: str, subject: str, new_link: str):
-    """ Function to update link by group and subject name """
+    """
+        Function to update link by group and subject name
+
+        :param group: group name of user used in filter
+        :param subject: name of lesson which is used in filter
+        :param new_link: new link to update
+    """
     filter = f"UPDATE info_professor SET link = '{new_link}' WHERE group_name='{group}' AND subject = '{subject}'"
     SQL.table_operate(filter)
     add_log(f"{group}: Link changed successfully")
 
 
-def time_by_number(number: int):
-    """ Function to execute time of lesson given """
+def time_by_number(number: int) -> str:
+    """
+        Function to execute time of lesson given
+
+        :param number: number of lesson which is used in filter
+    """
     filter = f"SELECT time_lesson{number} FROM info_global"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
-def day_name(day: int):
-    """ Function to execute name of day by day number """
+def day_name(day: int) -> str:
+    """
+        Function to execute name of day by day number
+
+        :param day: number of day which is used in filter
+    """
     filter = f"SELECT day{day} FROM info_global"
     result = reformation_data.reformat_str(SQL.execute(filter))
     return result
 
 
 def inserter_schedule(week: str, group: str, data: dict):
-    """ Function inserts or updates schedule for a group """
+    """
+        Function inserts or updates schedule for a group
+
+        :param week: number of week which is inserting
+        :param group: name of group which schedule is inserting
+        :param data: all schedule in dict format
+    """
     if week == "week1":
         counter = 1
     else:
@@ -149,7 +191,13 @@ def inserter_schedule(week: str, group: str, data: dict):
 
 
 def inserter_professor(week: str, group: str, data: dict):
-    """ Function inserts or updates professors for a group """
+    """
+        Function inserts or updates professors for a group
+
+        :param week: number of week which is inserting
+        :param group: name of group which professors is inserting
+        :param data: all professors in dict format
+    """
     for days in data[f"{week}"]:
         for lessons_professors in days:
             if lessons_professors is not None:

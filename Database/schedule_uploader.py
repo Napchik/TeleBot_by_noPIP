@@ -2,7 +2,7 @@
     Description: This file makes upload parsing data to Database
 
     Author: Mikhail Shikalovskyi
-    Version: 1.3
+    Version: 1.0 (release)
 """
 import parsing
 from Database import db_function
