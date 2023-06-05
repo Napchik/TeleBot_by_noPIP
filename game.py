@@ -151,10 +151,10 @@ async def dice_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                        resize_keyboard=True)
 
     data_user = await roll_dice(update.effective_chat.id, 'Ви 👨 підкидаєте кубик')
-    # await sleep(5)
+    await sleep(5)
 
     data_bot = await roll_dice(update.effective_chat.id, 'Бот 🤖 підкидає кубик')
-    # await sleep(5)
+    await sleep(5)
 
     if data_bot > data_user:
         await context.bot.send_message(chat_id=update.effective_chat.id, text='Бот виграв 🌧')
@@ -216,5 +216,5 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                          KeyboardButton(text=answers.BACK)]],
                                        one_time_keyboard=True,
                                        resize_keyboard=True)
-    await context.bot.send_message(text="До наступної гри!", reply_markup=reply_markup)
+    await context.bot.send_message(chat_id=user.id, text="До наступної гри!", reply_markup=reply_markup)
     return ConversationHandler.END
